@@ -21,28 +21,49 @@
   --accent:  #d4f050;
   --amber:   #f0a030;
   --red:     #f05050;
-  --glass:   rgba(13,13,18,0.82);
+  --glass:   rgba(13,13,18,0.80);
   --radius:  10px;
 }
 
-html, body { height: 100%; background: var(--ink); font-family: 'DM Mono', monospace; color: var(--paper); overflow: hidden; }
+html, body {
+  height: 100%; width: 100%;
+  background: var(--ink);
+  font-family: 'DM Mono', monospace;
+  color: var(--paper);
+  overflow: hidden;
+}
 
-#map { position: fixed; inset: 0; }
+/* MAP — always full screen behind everything */
+#map {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+/* All UI layers sit above the map */
+#hud, #day-wrap, #past-banner,
+#btn-follow, #btn-units, #btn-places,
+#dwell-badge, #controls,
+#place-sheet, #place-popup { z-index: 10; }
+
+/* Welcome sits on top but only covers its own footprint — map shows around it */
+#welcome { z-index: 15; }
+#place-sheet { z-index: 20; }
 
 /* ── HEADER ── */
 #hud {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 10;
-  padding: 20px 20px 0;
+  position: fixed; top: 0; left: 0; right: 0;
+  padding: 16px 16px 0;
   pointer-events: none;
 }
 
 #hud-inner {
   background: var(--glass);
   border: 1px solid var(--border);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: var(--radius);
-  padding: 14px 18px;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -52,7 +73,7 @@ html, body { height: 100%; background: var(--ink); font-family: 'DM Mono', monos
 #wordmark {
   font-family: 'Syne', sans-serif;
   font-weight: 800;
-  font-size: 1.05rem;
+  font-size: 1rem;
   letter-spacing: 0.2em;
   color: var(--accent);
   text-transform: uppercase;
@@ -62,31 +83,28 @@ html, body { height: 100%; background: var(--ink); font-family: 'DM Mono', monos
 #wordmark span {
   display: block;
   font-family: 'DM Mono', monospace;
-  font-size: 0.42rem;
+  font-size: 0.4rem;
   letter-spacing: 0.3em;
   color: var(--muted);
-  font-weight: 400;
   margin-top: 4px;
 }
 
-#stats-row { display: flex; gap: 18px; }
-
-.stat { text-align: right; cursor: pointer; }
+#stats-row { display: flex; gap: 16px; }
+.stat { text-align: right; }
 
 .stat-val {
   font-family: 'Syne', sans-serif;
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 1rem;
   color: var(--paper);
   line-height: 1;
   transition: color 0.25s;
 }
-
 .stat-val.dim { color: var(--muted); }
 
 .stat-label {
-  font-size: 0.4rem;
-  letter-spacing: 0.2em;
+  font-size: 0.38rem;
+  letter-spacing: 0.18em;
   color: var(--muted);
   text-transform: uppercase;
   margin-top: 3px;
@@ -94,60 +112,57 @@ html, body { height: 100%; background: var(--ink); font-family: 'DM Mono', monos
 
 /* ── DAY STRIP ── */
 #day-wrap {
-  position: fixed; top: 90px; left: 0; right: 0; z-index: 10;
-  padding: 0 20px;
+  position: fixed; top: 80px; left: 0; right: 0;
+  padding: 0 16px;
 }
 
 #day-strip {
   display: flex; gap: 7px;
   overflow-x: auto; scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 4px;
+  padding-bottom: 2px;
 }
-
 #day-strip::-webkit-scrollbar { display: none; }
 
 .day-chip {
   flex-shrink: 0;
   font-family: 'Syne', sans-serif;
   font-weight: 700;
-  font-size: 0.55rem;
+  font-size: 0.52rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 7px 14px;
+  padding: 7px 13px;
   border-radius: 20px;
   border: 1px solid var(--border);
   background: var(--glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   color: var(--muted);
   cursor: pointer;
   white-space: nowrap;
   -webkit-tap-highlight-color: transparent;
   transition: all 0.15s;
 }
-
 .day-chip.has-data { border-color: rgba(212,240,80,0.25); color: rgba(232,228,219,0.7); }
 .day-chip.active   { background: var(--accent); color: var(--ink); border-color: var(--accent); }
 
 /* ── PAST BANNER ── */
 #past-banner {
-  position: fixed; top: 136px; left: 50%; transform: translateX(-50%);
-  z-index: 11;
-  background: rgba(240,80,80,0.1);
-  border: 1px solid rgba(240,80,80,0.28);
-  backdrop-filter: blur(10px);
+  position: fixed; top: 126px; left: 50%; transform: translateX(-50%);
+  background: rgba(240,80,80,0.12);
+  border: 1px solid rgba(240,80,80,0.3);
+  backdrop-filter: blur(8px);
   border-radius: 6px;
-  padding: 5px 16px;
-  font-size: 0.5rem; letter-spacing: 0.16em;
+  padding: 5px 14px;
+  font-size: 0.48rem; letter-spacing: 0.16em;
   color: var(--red); text-transform: uppercase;
   display: none; white-space: nowrap;
 }
 #past-banner.visible { display: block; }
 
-/* ── FLOATING BUTTONS ── */
+/* ── FABs ── */
 .fab {
-  position: fixed; z-index: 10;
+  position: fixed;
   width: 46px; height: 46px;
   border-radius: 50%;
   border: 1px solid var(--border);
@@ -160,138 +175,149 @@ html, body { height: 100%; background: var(--ink); font-family: 'DM Mono', monos
   -webkit-tap-highlight-color: transparent;
   transition: border-color 0.2s, background 0.2s, transform 0.12s;
 }
-.fab:active { transform: scale(0.92); }
-.fab.active-fab { border-color: var(--accent); background: rgba(212,240,80,0.12); }
+.fab:active { transform: scale(0.90); }
+.fab.on { border-color: var(--accent); background: rgba(212,240,80,0.14); }
 
-#btn-follow { bottom: 180px; right: 20px; }
-#btn-units  { bottom: 180px; left: 20px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.6rem; letter-spacing: 0.08em; color: var(--paper); }
-#btn-places { bottom: 126px; right: 20px; }
+#btn-follow { bottom: 176px; right: 16px; }
+#btn-units  {
+  bottom: 176px; left: 16px;
+  font-family: 'Syne', sans-serif; font-weight: 700;
+  font-size: 0.58rem; letter-spacing: 0.08em;
+  color: var(--paper);
+}
+#btn-places { bottom: 120px; right: 16px; }
 
 /* ── DWELL ── */
 #dwell-badge {
-  position: fixed; bottom: 126px; left: 20px; z-index: 10;
+  position: fixed; bottom: 120px; left: 16px;
   background: var(--glass);
   border: 1px solid var(--border);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(10px);
   border-radius: 8px;
-  padding: 8px 14px;
-  font-size: 0.54rem; letter-spacing: 0.1em;
+  padding: 8px 12px;
+  font-size: 0.52rem; letter-spacing: 0.1em;
   color: var(--muted); display: none;
 }
 #dwell-badge.visible { display: block; }
-#dwell-badge strong  { color: var(--accent); font-family: 'Syne', sans-serif; }
+#dwell-badge strong { color: var(--accent); font-family: 'Syne', sans-serif; }
 
 /* ── BOTTOM CONTROLS ── */
 #controls {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 10;
-  padding: 14px 20px 38px;
+  position: fixed; bottom: 0; left: 0; right: 0;
+  padding: 12px 16px 36px;
   display: flex; gap: 10px; align-items: stretch;
-  background: linear-gradient(to top, rgba(13,13,18,0.97) 55%, transparent 100%);
+  background: linear-gradient(to top, rgba(13,13,18,0.96) 60%, transparent 100%);
 }
 
 #btn-track {
   flex: 1;
   font-family: 'Syne', sans-serif; font-weight: 800;
-  font-size: 0.82rem; letter-spacing: 0.2em; text-transform: uppercase;
+  font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase;
   color: var(--ink); background: var(--accent);
   border: none; border-radius: var(--radius);
-  padding: 19px 20px;
+  padding: 18px 20px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s, background 0.2s, box-shadow 0.2s;
+  transition: transform 0.12s, background 0.2s;
   box-shadow:
-    0 0 0 2px rgba(212,240,80,0.18),
-    0 4px 20px rgba(212,240,80,0.45),
-    0 8px 48px rgba(212,240,80,0.28);
-  animation: green-pulse 2.8s ease-in-out infinite;
+    0 0 0 2px rgba(212,240,80,0.15),
+    0 4px 20px rgba(212,240,80,0.5),
+    0 8px 48px rgba(212,240,80,0.25);
+  animation: gbreathe 2.8s ease-in-out infinite;
 }
-@keyframes green-pulse {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(212,240,80,0.18), 0 4px 20px rgba(212,240,80,0.45), 0 8px 48px rgba(212,240,80,0.28); }
-  50%       { box-shadow: 0 0 0 4px rgba(212,240,80,0.10), 0 4px 28px rgba(212,240,80,0.65), 0 12px 64px rgba(212,240,80,0.38); }
+@keyframes gbreathe {
+  0%,100% { box-shadow: 0 0 0 2px rgba(212,240,80,0.15), 0 4px 20px rgba(212,240,80,0.5),  0 8px 48px rgba(212,240,80,0.25); }
+  50%      { box-shadow: 0 0 0 4px rgba(212,240,80,0.08), 0 4px 28px rgba(212,240,80,0.72), 0 12px 60px rgba(212,240,80,0.38); }
 }
-#btn-track:active  { transform: scale(0.97); }
-#btn-track.active  {
+#btn-track:active { transform: scale(0.97); }
+#btn-track.active {
   background: var(--red); color: #fff;
-  box-shadow: 0 4px 20px rgba(240,80,80,0.4), 0 8px 40px rgba(240,80,80,0.2);
+  box-shadow: 0 4px 20px rgba(240,80,80,0.45);
   animation: none;
 }
-#btn-track:disabled{ opacity: 0.2; pointer-events: none; box-shadow: none; animation: none; }
+#btn-track:disabled { opacity: 0.2; pointer-events: none; box-shadow: none; animation: none; }
 
 #btn-clear {
-  font-family: 'DM Mono', monospace; font-size: 0.58rem;
+  font-family: 'DM Mono', monospace; font-size: 0.56rem;
   letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--muted);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 16px 16px;
+  padding: 18px 14px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: color 0.2s, border-color 0.2s;
   white-space: nowrap;
+  transition: color 0.2s;
 }
-#btn-clear:hover   { color: var(--paper); border-color: rgba(255,255,255,0.2); }
-#btn-clear:disabled{ opacity: 0.15; pointer-events: none; }
+#btn-clear:hover { color: var(--paper); }
+#btn-clear:disabled { opacity: 0.15; pointer-events: none; }
 
-/* ── PULSE ── */
-.pulse-marker {
+/* ── PULSE DOT ── */
+.pulse-dot {
   width: 16px; height: 16px; border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 0 3px rgba(13,13,18,0.6);
-  animation: pulse 2s infinite;
+  box-shadow: 0 0 0 3px rgba(13,13,18,0.7);
+  animation: pdot 2s infinite;
 }
-@keyframes pulse {
-  0%   { box-shadow: 0 0 0 3px rgba(13,13,18,0.6), 0 0 0 0 rgba(212,240,80,0.5); }
-  70%  { box-shadow: 0 0 0 3px rgba(13,13,18,0.6), 0 0 0 14px rgba(212,240,80,0); }
-  100% { box-shadow: 0 0 0 3px rgba(13,13,18,0.6), 0 0 0 0 rgba(212,240,80,0); }
-}
-
-/* ── PLACE MARKER ── */
-.place-marker-el {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: var(--amber);
-  border: 2px solid var(--ink);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.7rem; cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+@keyframes pdot {
+  0%   { box-shadow: 0 0 0 3px rgba(13,13,18,0.7), 0 0 0 0 rgba(212,240,80,0.6); }
+  70%  { box-shadow: 0 0 0 3px rgba(13,13,18,0.7), 0 0 0 14px rgba(212,240,80,0); }
+  100% { box-shadow: 0 0 0 3px rgba(13,13,18,0.7), 0 0 0 0 rgba(212,240,80,0); }
 }
 
-/* ── WELCOME ── */
+/* ── WELCOME CARD — floats over map, doesn't block it ── */
 #welcome {
-  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  z-index: 20;
+  position: fixed;
+  top: 160px; left: 50%; transform: translateX(-50%);
   background: var(--glass);
   border: 1px solid var(--border);
-  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: 14px;
-  padding: 30px 28px; text-align: center;
-  max-width: 300px; width: 88vw;
+  padding: 24px 24px;
+  text-align: center;
+  max-width: 280px; width: 84vw;
   display: none;
+  /* pointer-events only on the card itself */
+  pointer-events: all;
 }
 #welcome.visible { display: block; }
 #welcome h2 {
   font-family: 'Syne', sans-serif; font-weight: 800;
-  font-size: 1rem; letter-spacing: 0.14em;
-  color: var(--accent); margin-bottom: 12px;
+  font-size: 0.95rem; letter-spacing: 0.14em;
+  color: var(--accent); margin-bottom: 10px;
 }
-#welcome p { font-size: 0.62rem; color: var(--muted); line-height: 1.85; }
+#welcome p { font-size: 0.6rem; color: var(--muted); line-height: 1.85; }
+#welcome-close {
+  margin-top: 14px;
+  font-family: 'Syne', sans-serif; font-weight: 700;
+  font-size: 0.55rem; letter-spacing: 0.12em;
+  color: var(--muted); cursor: pointer;
+  text-transform: uppercase;
+  -webkit-tap-highlight-color: transparent;
+}
 
-/* ── PLACE NAME SHEET ── */
+/* ── PLACE SHEET ── */
 #place-sheet {
-  position: fixed; bottom: -200px; left: 0; right: 0; z-index: 30;
+  position: fixed; bottom: -300px; left: 0; right: 0;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-bottom: none;
+  border: 1px solid var(--border); border-bottom: none;
   border-radius: 16px 16px 0 0;
-  padding: 20px 20px 44px;
+  padding: 22px 20px 48px;
   transition: bottom 0.3s cubic-bezier(0.4,0,0.2,1);
 }
 #place-sheet.open { bottom: 0; }
 
 #place-sheet h3 {
   font-family: 'Syne', sans-serif; font-weight: 700;
-  font-size: 0.7rem; letter-spacing: 0.14em;
-  color: var(--amber); text-transform: uppercase; margin-bottom: 14px;
+  font-size: 0.68rem; letter-spacing: 0.14em;
+  color: var(--amber); text-transform: uppercase; margin-bottom: 6px;
+}
+
+#place-coords {
+  font-size: 0.48rem; color: var(--muted);
+  letter-spacing: 0.08em; margin-bottom: 14px;
 }
 
 #place-input {
@@ -299,46 +325,53 @@ html, body { height: 100%; background: var(--ink); font-family: 'DM Mono', monos
   background: var(--ink);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 12px 14px;
-  font-family: 'DM Mono', monospace; font-size: 0.85rem;
-  color: var(--paper);
-  outline: none;
+  padding: 13px 14px;
+  font-family: 'DM Mono', monospace; font-size: 0.9rem;
+  color: var(--paper); outline: none;
   margin-bottom: 12px;
 }
 #place-input:focus { border-color: var(--amber); }
 
-#place-sheet-btns { display: flex; gap: 10px; }
-
-.sheet-btn {
+.sheet-btns { display: flex; gap: 10px; }
+.sBtn {
   flex: 1; font-family: 'Syne', sans-serif; font-weight: 700;
-  font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase;
-  border-radius: 8px; padding: 12px; cursor: pointer;
-  -webkit-tap-highlight-color: transparent; border: none;
+  font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase;
+  border-radius: 8px; padding: 13px; cursor: pointer; border: none;
+  -webkit-tap-highlight-color: transparent;
 }
-.sheet-btn.confirm { background: var(--amber); color: var(--ink); }
-.sheet-btn.cancel  { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+.sBtn.ok  { background: var(--amber); color: var(--ink); }
+.sBtn.no  { background: transparent; color: var(--muted); border: 1px solid var(--border); }
 
 /* ── PLACE POPUP ── */
 #place-popup {
-  position: fixed; z-index: 25;
+  position: fixed;
   background: var(--glass);
   border: 1px solid rgba(240,160,48,0.3);
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(14px);
   border-radius: 8px;
   padding: 10px 14px;
-  font-size: 0.65rem; color: var(--paper);
-  display: none;
-  pointer-events: none;
-  max-width: 180px;
+  font-size: 0.62rem; color: var(--paper);
+  display: none; max-width: 180px;
+  pointer-events: all;
 }
+#place-popup .pname { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--amber); margin-bottom: 3px; }
+#place-popup .pdel  { font-size: 0.48rem; color: var(--muted); cursor: pointer; margin-top: 8px; display: block; }
 
-#place-popup .pop-name { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--amber); margin-bottom: 2px; }
-#place-popup .pop-del  { font-size: 0.5rem; color: var(--muted); pointer-events: all; cursor: pointer; margin-top: 6px; display: inline-block; }
+/* ── PLACE MARKER ── */
+.pmarker {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--amber); border: 2px solid var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
 ```
 
   </style>
 </head>
 <body>
+
+<!-- MAP — always behind everything -->
 
 <div id="map"></div>
 
@@ -348,13 +381,13 @@ html, body { height: 100%; background: var(--ink); font-family: 'DM Mono', monos
   <div id="hud-inner">
     <div id="wordmark">Footprint<span>daily location trail</span></div>
     <div id="stats-row">
-      <div class="stat" id="stat-dist-wrap" title="Tap to toggle units">
-        <div class="stat-val" id="stat-dist">0.0</div>
-        <div class="stat-label" id="stat-dist-label">km</div>
+      <div class="stat">
+        <div class="stat-val" id="stat-dist">—</div>
+        <div class="stat-label" id="stat-dist-lbl">km</div>
       </div>
       <div class="stat">
         <div class="stat-val" id="stat-pts">0</div>
-        <div class="stat-label">points</div>
+        <div class="stat-label">pts</div>
       </div>
       <div class="stat">
         <div class="stat-val" id="stat-time">—</div>
@@ -364,7 +397,7 @@ html, body { height: 100%; background: var(--ink); font-family: 'DM Mono', monos
   </div>
 </div>
 
-<!-- DAY STRIP -->
+<!-- DAY CHIPS -->
 
 <div id="day-wrap"><div id="day-strip"></div></div>
 
@@ -374,510 +407,500 @@ html, body { height: 100%; background: var(--ink); font-family: 'DM Mono', monos
 
 <!-- FABs -->
 
-<button class="fab active-fab" id="btn-follow" title="Follow mode">📍</button>
-<button class="fab" id="btn-units" title="Toggle units">KM</button>
-<button class="fab" id="btn-places" title="Drop a place pin">📌</button>
+<button class="fab on" id="btn-follow">📍</button>
+<button class="fab"    id="btn-units">KM</button>
+<button class="fab"    id="btn-places">📌</button>
 
 <!-- DWELL -->
 
 <div id="dwell-badge">Dwell: <strong id="dwell-val">—</strong></div>
 
-<!-- WELCOME -->
+<!-- WELCOME — floats over map, map still visible around it -->
 
 <div id="welcome" class="visible">
   <h2>FOOTPRINT</h2>
-  <p>Tap <strong style="color:var(--paper)">START TRACKING</strong> to begin today's trail.<br><br>Each day saves separately. Tap the chips above to revisit past days.<br><br>Use 📌 to drop named pins on places that matter.</p>
+  <p>Tap <strong style="color:var(--paper)">START TRACKING</strong> to record today's trail.<br><br>Each day saves separately. Swipe the chips above to revisit past days.<br><br>Tap 📌 to drop a named pin at your location.</p>
+  <div id="welcome-close">Got it ✕</div>
 </div>
 
-<!-- CONTROLS -->
+<!-- BOTTOM CONTROLS -->
 
 <div id="controls">
   <button id="btn-clear">Clear Day</button>
   <button id="btn-track">Start Tracking</button>
 </div>
 
-<!-- PLACE NAME SHEET -->
+<!-- PLACE SHEET (slides up) -->
 
 <div id="place-sheet">
   <h3>📌 Name this place</h3>
-  <div id="place-coords-display" style="font-size:0.5rem;color:var(--muted);margin-bottom:10px;letter-spacing:0.1em;"></div>
-  <input id="place-input" type="text" placeholder="e.g. Home, Gym, Coffee spot…" maxlength="40" />
-  <div id="place-sheet-btns">
-    <button class="sheet-btn cancel" id="place-cancel">Cancel</button>
-    <button class="sheet-btn confirm" id="place-confirm">Save Pin</button>
+  <div id="place-coords"></div>
+  <input id="place-input" type="text" placeholder="Home, Gym, Coffee shop…" maxlength="40" />
+  <div class="sheet-btns">
+    <button class="sBtn no"  id="place-cancel">Cancel</button>
+    <button class="sBtn ok"  id="place-save">Save Pin</button>
   </div>
 </div>
 
 <!-- PLACE POPUP -->
 
 <div id="place-popup">
-  <div class="pop-name" id="pop-name"></div>
-  <div id="pop-coords"></div>
-  <span class="pop-del" id="pop-del">✕ Remove pin</span>
+  <div class="pname" id="pop-name"></div>
+  <span class="pdel" id="pop-del">✕ Remove pin</span>
 </div>
 
 <script>
-  // ── CONFIG ──
-  const MAPBOX_TOKEN = 'pk.eyJ1IjoidW5jb21tb25jb3dib3kiLCJhIjoiY21rNjN2c2R1MHFodjNkb2wybWxweGNvNyJ9.4j78jvsPEWDh-T19ZSeqMA';
-  const INTERVAL_MS  = 8000;
-  const MAX_DAYS     = 14;
-  const PLACES_KEY   = 'fp_places_v1';
+// ── CONFIG ──────────────────────────────────────────────
+const TOKEN     = 'pk.eyJ1IjoidW5jb21tb25jb3dib3kiLCJhIjoiY21rNjN2c2R1MHFodjNkb2wybWxweGNvNyJ9.4j78jvsPEWDh-T19ZSeqMA';
+const TICK      = 8000;   // record GPS point every 8s
+const MAX_DAYS  = 14;
+const PL_KEY    = 'fp_places_v1';
 
-  // ── UNITS ──
-  let useMetric = localStorage.getItem('fp_units') !== 'imperial';
+// ── UNITS ────────────────────────────────────────────────
+let metric = localStorage.getItem('fp_units') !== 'mi';
+const toDisplay = km => metric ? km : km * 0.621371;
+const unitLbl   = ()  => metric ? 'km' : 'mi';
 
-  function distLabel()  { return useMetric ? 'km' : 'mi'; }
-  function distConvert(km) { return useMetric ? km : km * 0.621371; }
+// ── DATE HELPERS ─────────────────────────────────────────
+function pad(n) { return String(n).padStart(2,'0'); }
 
-  // ── DATE HELPERS ──
-  function todayKey() {
-    const d = new Date();
-    return `fp_${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+function todayKey() {
+  const d = new Date();
+  return `fp_${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+
+function keyLabel(key) {
+  const [y,m,d] = key.replace('fp_','').split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diff = Math.round((today - dt) / 86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  return dt.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+}
+
+function allDayKeys() {
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('fp_') && !k.includes('places') && !k.includes('units')) keys.push(k);
   }
-  function pad(n) { return String(n).padStart(2,'0'); }
+  return keys.sort().reverse();
+}
 
-  function keyToLabel(key) {
-    const [y,m,d] = key.replace('fp_','').split('-').map(Number);
-    const date  = new Date(y, m-1, d);
-    const today = new Date(); today.setHours(0,0,0,0);
-    const diff  = Math.round((today - date) / 86400000);
-    if (diff === 0) return 'Today';
-    if (diff === 1) return 'Yesterday';
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  }
+function loadDay(key) {
+  try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : []; } catch { return []; }
+}
 
-  function getAllDayKeys() {
-    const keys = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('fp_') && !k.includes('places') && !k.includes('units')) keys.push(k);
-    }
-    return keys.sort().reverse();
-  }
+function saveDay(key, pts) {
+  try { localStorage.setItem(key, JSON.stringify(pts)); } catch {}
+  const keys = allDayKeys();
+  if (keys.length > MAX_DAYS) keys.slice(MAX_DAYS).forEach(k => localStorage.removeItem(k));
+}
 
-  function loadDay(key)      { try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : []; } catch(e) { return []; } }
-  function saveDay(key, pts) {
-    try { localStorage.setItem(key, JSON.stringify(pts)); } catch(e) {}
-    const keys = getAllDayKeys();
-    if (keys.length > MAX_DAYS) keys.slice(MAX_DAYS).forEach(k => localStorage.removeItem(k));
-  }
+// ── PLACES ───────────────────────────────────────────────
+let places = [];
+try { places = JSON.parse(localStorage.getItem(PL_KEY) || '[]'); } catch {}
+function savePlaces() { try { localStorage.setItem(PL_KEY, JSON.stringify(places)); } catch {} }
 
-  // ── PLACES ──
-  let places = [];
-  try { places = JSON.parse(localStorage.getItem(PLACES_KEY) || '[]'); } catch(e) {}
-  function savePlaces() { try { localStorage.setItem(PLACES_KEY, JSON.stringify(places)); } catch(e) {} }
+// ── STATE ────────────────────────────────────────────────
+let tracking    = false;
+let followMode  = true;
+let watchId     = null;
+let tickId      = null;
+let timerId     = null;
+let startTime   = null;
+let currentPos  = null;
+let dot         = null;   // pulse marker
+let pendingLL   = null;   // lngLat for next pin
+let pMarkers    = [];     // place marker objects
+let activeDay   = todayKey();
+let points      = loadDay(activeDay);
 
-  // ── STATE ──
-  let tracking    = false;
-  let followMode  = true;
-  let pendingLngLat = null;
-  let watchId     = null;
-  let intervalId  = null;
-  let timerTick   = null;
-  let startTime   = null;
-  let currentPos  = null;
-  let pulseMarker = null;
-  let pendingLngLat = null;
-  let activeDay   = todayKey();
-  let points      = loadDay(activeDay);
-  let placeMarkers = [];
+// ── MAP ──────────────────────────────────────────────────
+mapboxgl.accessToken = TOKEN;
 
-  // ── MAP ──
-  mapboxgl.accessToken = MAPBOX_TOKEN;
+const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/dark-v11',
+  center: [-80.19, 25.77],
+  zoom: 14,
+  attributionControl: false
+});
 
-  const map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/dark-v11',
-    center: [-80.19, 25.77],
-    zoom: 14,
-    attributionControl: false
+map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'top-right');
+
+map.on('load', () => {
+  addSources();
+  buildStrip();
+  drawPlaces();
+  if (points.length > 1) { renderTrail(); flyLast(); }
+  updateStats();
+  updateUnits();
+});
+
+// ── SOURCES ──────────────────────────────────────────────
+function addSources() {
+  map.addSource('trail', { type:'geojson', data: fc([]) });
+
+  map.addLayer({
+    id:'trail-glow', type:'line', source:'trail',
+    layout:{ 'line-cap':'round','line-join':'round' },
+    paint:{ 'line-color':'#d4f050','line-width':['*',['get','w'],4],'line-opacity':0.1,'line-blur':10 }
   });
 
-  // Hide Mapbox attribution logo area (we still respect attribution via compact control)
-  map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'top-right');
-
-  map.on('load', () => {
-    initSources();
-    buildDayStrip();
-    renderPlaces();
-    if (points.length > 1)  { renderTrail(); flyToTrail(); }
-    else document.getElementById('welcome').classList.add('visible');
-    updateStats();
-    updateUnitsUI();
+  map.addLayer({
+    id:'trail-line', type:'line', source:'trail',
+    layout:{ 'line-cap':'round','line-join':'round' },
+    paint:{ 'line-color':'#d4f050','line-width':['get','w'],'line-opacity':0.82 }
   });
 
-  // ── SOURCES ──
-  function initSources() {
-    map.addSource('trail', { type: 'geojson', data: emptyFC() });
-
-    map.addLayer({
-      id: 'trail-glow', type: 'line', source: 'trail',
-      layout: { 'line-cap': 'round', 'line-join': 'round' },
-      paint: { 'line-color': '#d4f050', 'line-width': ['*', ['get', 'weight'], 4], 'line-opacity': 0.1, 'line-blur': 10 }
-    });
-
-    map.addLayer({
-      id: 'trail-line', type: 'line', source: 'trail',
-      layout: { 'line-cap': 'round', 'line-join': 'round' },
-      paint: { 'line-color': '#d4f050', 'line-width': ['get', 'weight'], 'line-opacity': 0.8 }
-    });
-
-    map.addSource('dwell-pts', { type: 'geojson', data: emptyFC() });
-    map.addLayer({
-      id: 'dwell-circles', type: 'circle', source: 'dwell-pts',
-      paint: {
-        'circle-radius': ['interpolate', ['linear'], ['get', 'count'], 1, 10, 10, 48],
-        'circle-color': '#d4f050',
-        'circle-opacity': ['interpolate', ['linear'], ['get', 'count'], 1, 0.05, 10, 0.22],
-        'circle-blur': 1.4
-      }
-    }, 'trail-glow');
-  }
-
-  function emptyFC() { return { type: 'FeatureCollection', features: [] }; }
-
-  // ── DAY STRIP ──
-  function buildDayStrip() {
-    const strip = document.getElementById('day-strip');
-    strip.innerHTML = '';
-    const keys = getAllDayKeys();
-    if (!keys.includes(todayKey())) keys.unshift(todayKey());
-
-    keys.forEach(key => {
-      const chip = document.createElement('button');
-      chip.className = 'day-chip';
-      chip.textContent = keyToLabel(key);
-      chip.dataset.key = key;
-      const pts = loadDay(key);
-      if (pts.length > 0) chip.classList.add('has-data');
-      if (key === activeDay) chip.classList.add('active');
-      chip.addEventListener('click', () => switchDay(key));
-      strip.appendChild(chip);
-    });
-  }
-
-  function switchDay(key) {
-    if (tracking) stopTracking();
-    activeDay = key;
-    points    = loadDay(key);
-    startTime = null;
-
-    document.querySelectorAll('.day-chip').forEach(c => c.classList.toggle('active', c.dataset.key === key));
-
-    const isToday = key === todayKey();
-    document.getElementById('past-banner').classList.toggle('visible', !isToday);
-    document.getElementById('btn-track').disabled = !isToday;
-    document.getElementById('btn-clear').disabled = !isToday;
-    document.querySelectorAll('.stat-val').forEach(el => el.classList.toggle('dim', !isToday));
-
-    map.getSource('trail').setData(emptyFC());
-    map.getSource('dwell-pts').setData(emptyFC());
-    document.getElementById('dwell-badge').classList.remove('visible');
-    document.getElementById('stat-time').textContent = '—';
-
-    if (points.length > 1) { renderTrail(); flyToTrail(); }
-    else if (isToday) document.getElementById('welcome').classList.add('visible');
-    updateStats();
-  }
-
-  // ── RENDER TRAIL ──
-  function renderTrail() {
-    if (points.length < 2) return;
-    const lineFeatures = [];
-    const dwellMap = {};
-
-    for (let i = 0; i < points.length - 1; i++) {
-      const a = points[i], b = points[i+1];
-      const k = dwellKey(a);
-      dwellMap[k] = (dwellMap[k] || 0) + 1;
-      lineFeatures.push({
-        type: 'Feature',
-        geometry: { type: 'LineString', coordinates: [[a.lng, a.lat], [b.lng, b.lat]] },
-        properties: { weight: Math.min(2 + (dwellMap[k] || 1) * 0.85, 13) }
-      });
+  map.addSource('dwell', { type:'geojson', data: fc([]) });
+  map.addLayer({
+    id:'dwell-rings', type:'circle', source:'dwell',
+    paint:{
+      'circle-radius':['interpolate',['linear'],['get','n'],1,10,10,50],
+      'circle-color':'#d4f050',
+      'circle-opacity':['interpolate',['linear'],['get','n'],1,0.05,10,0.22],
+      'circle-blur':1.4
     }
+  }, 'trail-glow');
+}
 
-    map.getSource('trail').setData({ type: 'FeatureCollection', features: lineFeatures });
-    map.getSource('dwell-pts').setData({
-      type: 'FeatureCollection',
-      features: Object.entries(dwellMap).map(([k, count]) => {
-        const [lat, lng] = k.split(',').map(Number);
-        return { type: 'Feature', geometry: { type: 'Point', coordinates: [lng, lat] }, properties: { count } };
-      })
-    });
+function fc(features) { return { type:'FeatureCollection', features }; }
 
-    const max = Math.max(...Object.values(dwellMap));
-    if (max > 2) {
-      document.getElementById('dwell-badge').classList.add('visible');
-      document.getElementById('dwell-val').textContent = `${max} passes`;
-    }
-  }
+// ── DAY STRIP ────────────────────────────────────────────
+function buildStrip() {
+  const strip = document.getElementById('day-strip');
+  strip.innerHTML = '';
+  const keys = allDayKeys();
+  if (!keys.includes(todayKey())) keys.unshift(todayKey());
 
-  function dwellKey(pt) {
-    const r = 0.00015;
-    return `${(Math.round(pt.lat/r)*r).toFixed(5)},${(Math.round(pt.lng/r)*r).toFixed(5)}`;
-  }
-
-  function flyToTrail() {
-    if (!points.length) return;
-    const last = points[points.length-1];
-    map.flyTo({ center: [last.lng, last.lat], zoom: 15, duration: 1000 });
-  }
-
-  // ── TRACKING ──
-  document.getElementById('btn-track').addEventListener('click', () => {
-    if (!tracking) startTracking(); else stopTracking();
+  keys.forEach(key => {
+    const chip = document.createElement('button');
+    chip.className = 'day-chip';
+    chip.textContent = keyLabel(key);
+    chip.dataset.key = key;
+    if (loadDay(key).length > 0) chip.classList.add('has-data');
+    if (key === activeDay) chip.classList.add('active');
+    chip.addEventListener('click', () => switchDay(key));
+    strip.appendChild(chip);
   });
+}
 
-  function startTracking() {
-    if (!navigator.geolocation) { alert('Geolocation not supported.'); return; }
-    document.getElementById('welcome').classList.remove('visible');
-    tracking  = true;
-    startTime = startTime || Date.now();
-    document.getElementById('btn-track').textContent = 'Stop Tracking';
-    document.getElementById('btn-track').classList.add('active');
-    timerTick  = setInterval(updateTimer, 1000);
-    watchId    = navigator.geolocation.watchPosition(onPosition, onGeoError, { enableHighAccuracy: true, maximumAge: 3000 });
-    intervalId = setInterval(() => { if (currentPos) recordPoint(currentPos); }, INTERVAL_MS);
-    navigator.geolocation.getCurrentPosition(pos => {
-      currentPos = pos;
-      recordPoint(pos);
-      map.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: 16, duration: 800 });
-    }, onGeoError, { enableHighAccuracy: true });
+function switchDay(key) {
+  if (tracking) stopTracking();
+  activeDay = key;
+  points    = loadDay(key);
+  startTime = null;
+
+  document.querySelectorAll('.day-chip').forEach(c =>
+    c.classList.toggle('active', c.dataset.key === key)
+  );
+
+  const isToday = key === todayKey();
+  document.getElementById('past-banner').classList.toggle('visible', !isToday);
+  document.getElementById('btn-track').disabled = !isToday;
+  document.getElementById('btn-clear').disabled = !isToday;
+  document.querySelectorAll('.stat-val').forEach(el => el.classList.toggle('dim', !isToday));
+
+  map.getSource('trail').setData(fc([]));
+  map.getSource('dwell').setData(fc([]));
+  document.getElementById('dwell-badge').classList.remove('visible');
+  document.getElementById('stat-time').textContent = '—';
+
+  if (points.length > 1) { renderTrail(); flyLast(); }
+  else if (isToday) document.getElementById('welcome').classList.add('visible');
+  updateStats();
+}
+
+// ── RENDER TRAIL ─────────────────────────────────────────
+function renderTrail() {
+  if (points.length < 2) return;
+  const lines = [], dmap = {};
+
+  for (let i = 0; i < points.length - 1; i++) {
+    const a = points[i], b = points[i+1];
+    const k = dkey(a);
+    dmap[k] = (dmap[k] || 0) + 1;
+    lines.push({
+      type:'Feature',
+      geometry:{ type:'LineString', coordinates:[[a.lng,a.lat],[b.lng,b.lat]] },
+      properties:{ w: Math.min(2 + (dmap[k]||1) * 0.85, 13) }
+    });
   }
 
-  function stopTracking() {
-    tracking = false;
-    if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-    if (intervalId) clearInterval(intervalId);
-    if (timerTick)  clearInterval(timerTick);
-    document.getElementById('btn-track').textContent = 'Resume Tracking';
-    document.getElementById('btn-track').classList.remove('active');
-  }
+  map.getSource('trail').setData(fc(lines));
 
-  function onPosition(pos) {
+  map.getSource('dwell').setData(fc(
+    Object.entries(dmap).map(([k, n]) => {
+      const [lat,lng] = k.split(',').map(Number);
+      return { type:'Feature', geometry:{ type:'Point', coordinates:[lng,lat] }, properties:{ n } };
+    })
+  ));
+
+  const maxD = Math.max(...Object.values(dmap));
+  if (maxD > 2) {
+    document.getElementById('dwell-badge').classList.add('visible');
+    document.getElementById('dwell-val').textContent = `${maxD} passes`;
+  }
+}
+
+function dkey(pt) {
+  const r = 0.00015;
+  return `${(Math.round(pt.lat/r)*r).toFixed(5)},${(Math.round(pt.lng/r)*r).toFixed(5)}`;
+}
+
+function flyLast() {
+  if (!points.length) return;
+  const p = points[points.length-1];
+  map.flyTo({ center:[p.lng,p.lat], zoom:15, duration:900 });
+}
+
+// ── TRACKING ─────────────────────────────────────────────
+document.getElementById('btn-track').addEventListener('click', () => {
+  tracking ? stopTracking() : startTracking();
+});
+
+function startTracking() {
+  if (!navigator.geolocation) { alert('Geolocation not available.'); return; }
+  document.getElementById('welcome').classList.remove('visible');
+  tracking  = true;
+  startTime = startTime || Date.now();
+  document.getElementById('btn-track').textContent = 'Stop Tracking';
+  document.getElementById('btn-track').classList.add('active');
+  timerId = setInterval(tickTimer, 1000);
+
+  watchId = navigator.geolocation.watchPosition(onPos, onGeoErr,
+    { enableHighAccuracy:true, maximumAge:3000 });
+
+  tickId = setInterval(() => { if (currentPos) logPoint(currentPos); }, TICK);
+
+  navigator.geolocation.getCurrentPosition(pos => {
     currentPos = pos;
-    const { longitude: lng, latitude: lat } = pos.coords;
-    if (!pulseMarker) {
-      const el = document.createElement('div');
-      el.className = 'pulse-marker';
-      pulseMarker = new mapboxgl.Marker({ element: el }).setLngLat([lng, lat]).addTo(map);
-    } else {
-      pulseMarker.setLngLat([lng, lat]);
-    }
-    if (followMode) map.easeTo({ center: [lng, lat], duration: 800 });
-  }
+    logPoint(pos);
+    map.flyTo({ center:[pos.coords.longitude, pos.coords.latitude], zoom:16, duration:700 });
+  }, onGeoErr, { enableHighAccuracy:true });
+}
 
-  function recordPoint(pos) {
-    const { longitude: lng, latitude: lat } = pos.coords;
-    points.push({ lng, lat, ts: Date.now() });
-    saveDay(activeDay, points);
-    buildDayStrip();
-    renderTrail();
-    updateStats();
-  }
+function stopTracking() {
+  tracking = false;
+  if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+  clearInterval(tickId);
+  clearInterval(timerId);
+  document.getElementById('btn-track').textContent = 'Resume Tracking';
+  document.getElementById('btn-track').classList.remove('active');
+}
 
-  function onGeoError(err) { console.warn('Geo:', err.message); }
-
-  // ── FOLLOW ──
-  const btnFollow = document.getElementById('btn-follow');
-  btnFollow.addEventListener('click', () => {
-    followMode = !followMode;
-    btnFollow.classList.toggle('active-fab', followMode);
-    btnFollow.textContent = followMode ? '📍' : '🗺️';
-    if (followMode && currentPos)
-      map.easeTo({ center: [currentPos.coords.longitude, currentPos.coords.latitude], duration: 600 });
-  });
-
-  map.on('dragstart', () => {
-    if (followMode) {
-      followMode = false;
-      btnFollow.classList.remove('active-fab');
-      btnFollow.textContent = '🗺️';
-    }
-  });
-
-  // ── UNITS TOGGLE ──
-  const btnUnits = document.getElementById('btn-units');
-  btnUnits.addEventListener('click', () => {
-    useMetric = !useMetric;
-    localStorage.setItem('fp_units', useMetric ? 'metric' : 'imperial');
-    updateUnitsUI();
-    updateStats();
-  });
-
-  function updateUnitsUI() {
-    btnUnits.textContent = useMetric ? 'KM' : 'MI';
-    btnUnits.classList.toggle('active-fab', !useMetric);
-    document.getElementById('stat-dist-label').textContent = distLabel();
-  }
-
-  // ── PLACES ──
-  const btnPlaces  = document.getElementById('btn-places');
-  const placeSheet = document.getElementById('place-sheet');
-  const placeInput = document.getElementById('place-input');
-  const popup      = document.getElementById('place-popup');
-
-  // Tap 📌 → grab GPS immediately → open sheet → user names it → save
-  btnPlaces.addEventListener('click', () => {
-    hidePopup();
-
-    // If sheet already open, close it
-    if (placeSheet.classList.contains('open')) {
-      closePlaceSheet();
-      btnPlaces.classList.remove('active-fab');
-      return;
-    }
-
-    btnPlaces.classList.add('active-fab');
-
-    // Try to use current GPS position first
-    if (currentPos) {
-      pendingLngLat = { lng: currentPos.coords.longitude, lat: currentPos.coords.latitude };
-      openPlaceSheet();
-    } else {
-      // No GPS yet — ask for it now
-      btnPlaces.textContent = '⏳';
-      navigator.geolocation.getCurrentPosition(pos => {
-        pendingLngLat = { lng: pos.coords.longitude, lat: pos.coords.latitude };
-        btnPlaces.textContent = '📌';
-        openPlaceSheet();
-      }, () => {
-        // GPS failed — let user tap map instead
-        btnPlaces.textContent = '📌';
-        alert('Could not get your location. Make sure location access is allowed.');
-        btnPlaces.classList.remove('active-fab');
-      }, { enableHighAccuracy: true, timeout: 8000 });
-    }
-  });
-
-  function openPlaceSheet() {
-    placeInput.value = '';
-    if (pendingLngLat) {
-      document.getElementById('place-coords-display').textContent =
-        `📍 ${pendingLngLat.lat.toFixed(5)}, ${pendingLngLat.lng.toFixed(5)}`;
-    }
-    placeSheet.classList.add('open');
-    setTimeout(() => placeInput.focus(), 350);
-  }
-
-  // Map click still works as fallback on desktop
-  map.on('click', e => {
-    hidePopup();
-  });
-
-  document.getElementById('place-cancel').addEventListener('click', () => {
-    closePlaceSheet();
-    btnPlaces.classList.remove('active-fab');
-  });
-
-  document.getElementById('place-confirm').addEventListener('click', () => {
-    const name = placeInput.value.trim();
-    if (!name || !pendingLngLat) return;
-    const place = { id: Date.now(), name, lng: pendingLngLat.lng, lat: pendingLngLat.lat };
-    places.push(place);
-    savePlaces();
-    addPlaceMarker(place);
-    closePlaceSheet();
-    btnPlaces.classList.remove('active-fab');
-    // Fly to the pin
-    map.flyTo({ center: [place.lng, place.lat], zoom: 16, duration: 800 });
-  });
-
-  function closePlaceSheet() {
-    placeSheet.classList.remove('open');
-    pendingLngLat = null;
-  }
-
-  function renderPlaces() {
-    placeMarkers.forEach(m => m.remove());
-    placeMarkers = [];
-    places.forEach(addPlaceMarker);
-  }
-
-  function addPlaceMarker(place) {
+function onPos(pos) {
+  currentPos = pos;
+  const { longitude:lng, latitude:lat } = pos.coords;
+  if (!dot) {
     const el = document.createElement('div');
-    el.className = 'place-marker-el';
-    el.textContent = '📌';
-    el.title = place.name;
+    el.className = 'pulse-dot';
+    dot = new mapboxgl.Marker({ element:el }).setLngLat([lng,lat]).addTo(map);
+  } else {
+    dot.setLngLat([lng,lat]);
+  }
+  if (followMode) map.easeTo({ center:[lng,lat], duration:700 });
+}
 
-    const marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
-      .setLngLat([place.lng, place.lat])
-      .addTo(map);
+function logPoint(pos) {
+  const { longitude:lng, latitude:lat } = pos.coords;
+  points.push({ lng, lat, ts:Date.now() });
+  saveDay(activeDay, points);
+  buildStrip();
+  renderTrail();
+  updateStats();
+}
 
-    el.addEventListener('click', (e) => {
-      e.stopPropagation();
-      showPopup(place, e.clientX, e.clientY);
-    });
+function onGeoErr(e) { console.warn('GPS:', e.message); }
 
-    placeMarkers.push(marker);
+// ── FOLLOW ───────────────────────────────────────────────
+const btnFollow = document.getElementById('btn-follow');
+btnFollow.addEventListener('click', () => {
+  followMode = !followMode;
+  btnFollow.classList.toggle('on', followMode);
+  btnFollow.textContent = followMode ? '📍' : '🗺️';
+  if (followMode && currentPos)
+    map.easeTo({ center:[currentPos.coords.longitude, currentPos.coords.latitude], duration:600 });
+});
+
+map.on('dragstart', () => {
+  if (followMode) {
+    followMode = false;
+    btnFollow.classList.remove('on');
+    btnFollow.textContent = '🗺️';
+  }
+});
+
+// ── UNITS ────────────────────────────────────────────────
+const btnUnits = document.getElementById('btn-units');
+btnUnits.addEventListener('click', () => {
+  metric = !metric;
+  localStorage.setItem('fp_units', metric ? 'km' : 'mi');
+  updateUnits();
+  updateStats();
+});
+
+function updateUnits() {
+  btnUnits.textContent = metric ? 'KM' : 'MI';
+  btnUnits.classList.toggle('on', !metric);
+  document.getElementById('stat-dist-lbl').textContent = unitLbl();
+}
+
+// ── PLACES ───────────────────────────────────────────────
+const btnPlaces  = document.getElementById('btn-places');
+const placeSheet = document.getElementById('place-sheet');
+const placeInput = document.getElementById('place-input');
+
+btnPlaces.addEventListener('click', () => {
+  // Toggle sheet
+  if (placeSheet.classList.contains('open')) {
+    closePlaceSheet();
+    return;
   }
 
-  function showPopup(place, x, y) {
+  btnPlaces.classList.add('on');
+
+  // Use current GPS if available
+  if (currentPos) {
+    pendingLL = { lng: currentPos.coords.longitude, lat: currentPos.coords.latitude };
+    openPlaceSheet();
+  } else {
+    btnPlaces.textContent = '⏳';
+    navigator.geolocation.getCurrentPosition(pos => {
+      btnPlaces.textContent = '📌';
+      pendingLL = { lng: pos.coords.longitude, lat: pos.coords.latitude };
+      openPlaceSheet();
+    }, () => {
+      btnPlaces.textContent = '📌';
+      btnPlaces.classList.remove('on');
+      alert('Location not available. Start tracking first so the app knows where you are.');
+    }, { enableHighAccuracy:true, timeout:8000 });
+  }
+});
+
+function openPlaceSheet() {
+  placeInput.value = '';
+  document.getElementById('place-coords').textContent =
+    pendingLL ? `📍 ${pendingLL.lat.toFixed(5)}, ${pendingLL.lng.toFixed(5)}` : '';
+  placeSheet.classList.add('open');
+  setTimeout(() => placeInput.focus(), 380);
+}
+
+function closePlaceSheet() {
+  placeSheet.classList.remove('open');
+  btnPlaces.classList.remove('on');
+  pendingLL = null;
+}
+
+document.getElementById('place-cancel').addEventListener('click', closePlaceSheet);
+
+document.getElementById('place-save').addEventListener('click', () => {
+  const name = placeInput.value.trim();
+  if (!name) { placeInput.focus(); return; }
+  if (!pendingLL) { closePlaceSheet(); return; }
+
+  const place = { id: Date.now(), name, lng: pendingLL.lng, lat: pendingLL.lat };
+  places.push(place);
+  savePlaces();
+  addPlaceMarker(place);
+  map.flyTo({ center:[place.lng, place.lat], zoom:16, duration:700 });
+  closePlaceSheet();
+});
+
+// ── PLACE MARKERS ────────────────────────────────────────
+function drawPlaces() {
+  pMarkers.forEach(m => m.remove());
+  pMarkers = [];
+  places.forEach(addPlaceMarker);
+}
+
+function addPlaceMarker(place) {
+  const el = document.createElement('div');
+  el.className = 'pmarker';
+  el.textContent = '📌';
+
+  const m = new mapboxgl.Marker({ element:el, anchor:'bottom' })
+    .setLngLat([place.lng, place.lat])
+    .addTo(map);
+
+  el.addEventListener('click', e => {
+    e.stopPropagation();
+    const popup = document.getElementById('place-popup');
     popup.style.display = 'block';
-    popup.style.left = Math.min(x + 10, window.innerWidth - 200) + 'px';
-    popup.style.top  = Math.max(y - 80, 10) + 'px';
+    popup.style.left = Math.min(e.clientX + 10, window.innerWidth - 190) + 'px';
+    popup.style.top  = Math.max(e.clientY - 70, 10) + 'px';
     document.getElementById('pop-name').textContent = place.name;
-    document.getElementById('pop-coords').textContent =
-      `${place.lat.toFixed(4)}, ${place.lng.toFixed(4)}`;
     document.getElementById('pop-del').onclick = () => {
       places = places.filter(p => p.id !== place.id);
       savePlaces();
-      renderPlaces();
-      hidePopup();
+      drawPlaces();
+      popup.style.display = 'none';
     };
-  }
-
-  function hidePopup() { popup.style.display = 'none'; }
-  map.on('click', hidePopup);
-
-  // ── CLEAR ──
-  document.getElementById('btn-clear').addEventListener('click', () => {
-    if (!confirm("Clear today's trail?")) return;
-    points = [];
-    saveDay(activeDay, points);
-    map.getSource('trail').setData(emptyFC());
-    map.getSource('dwell-pts').setData(emptyFC());
-    document.getElementById('dwell-badge').classList.remove('visible');
-    startTime = null;
-    document.getElementById('stat-time').textContent = '—';
-    if (tracking) stopTracking();
-    document.getElementById('btn-track').textContent = 'Start Tracking';
-    document.getElementById('welcome').classList.add('visible');
-    buildDayStrip();
-    updateStats();
   });
 
-  // ── STATS ──
-  function updateStats() {
-    const km = calcDistance();
-    document.getElementById('stat-pts').textContent  = points.length;
-    document.getElementById('stat-dist').textContent = distConvert(km).toFixed(2);
-  }
+  pMarkers.push(m);
+}
 
-  function calcDistance() {
-    let d = 0;
-    for (let i = 1; i < points.length; i++) d += haversine(points[i-1], points[i]);
-    return d;
-  }
+map.on('click', () => {
+  document.getElementById('place-popup').style.display = 'none';
+});
 
-  function haversine(a, b) {
-    const R = 6371;
-    const dLat = (b.lat - a.lat) * Math.PI / 180;
-    const dLng = (b.lng - a.lng) * Math.PI / 180;
-    const x = Math.sin(dLat/2)**2 + Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
-    return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
-  }
+// ── CLEAR ────────────────────────────────────────────────
+document.getElementById('btn-clear').addEventListener('click', () => {
+  if (!confirm("Clear today's trail?")) return;
+  points = [];
+  saveDay(activeDay, points);
+  map.getSource('trail').setData(fc([]));
+  map.getSource('dwell').setData(fc([]));
+  document.getElementById('dwell-badge').classList.remove('visible');
+  startTime = null;
+  document.getElementById('stat-time').textContent = '—';
+  if (tracking) stopTracking();
+  document.getElementById('btn-track').textContent = 'Start Tracking';
+  document.getElementById('welcome').classList.add('visible');
+  buildStrip();
+  updateStats();
+});
 
-  function updateTimer() {
-    if (!startTime) return;
-    const secs = Math.floor((Date.now() - startTime) / 1000);
-    const h = Math.floor(secs / 3600);
-    const m = Math.floor((secs % 3600) / 60);
-    const s = secs % 60;
-    document.getElementById('stat-time').textContent =
-      h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
-  }
+// ── WELCOME CLOSE ─────────────────────────────────────────
+document.getElementById('welcome-close').addEventListener('click', () => {
+  document.getElementById('welcome').classList.remove('visible');
+});
+
+// ── STATS ────────────────────────────────────────────────
+function updateStats() {
+  const km = calcKm();
+  document.getElementById('stat-pts').textContent  = points.length;
+  document.getElementById('stat-dist').textContent = points.length < 2 ? '—' : toDisplay(km).toFixed(2);
+}
+
+function calcKm() {
+  let d = 0;
+  for (let i = 1; i < points.length; i++) d += haversine(points[i-1], points[i]);
+  return d;
+}
+
+function haversine(a, b) {
+  const R = 6371;
+  const dLat = (b.lat - a.lat) * Math.PI / 180;
+  const dLng = (b.lng - a.lng) * Math.PI / 180;
+  const x = Math.sin(dLat/2)**2 +
+            Math.cos(a.lat*Math.PI/180) * Math.cos(b.lat*Math.PI/180) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
+}
+
+function tickTimer() {
+  if (!startTime) return;
+  const s = Math.floor((Date.now() - startTime) / 1000);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  document.getElementById('stat-time').textContent =
+    h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`;
+}
 </script>
 
 </body>
