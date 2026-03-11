@@ -192,18 +192,30 @@ html, body { height: 100%; background: var(--ink); font-family: 'DM Mono', monos
 #btn-track {
   flex: 1;
   font-family: 'Syne', sans-serif; font-weight: 800;
-  font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase;
+  font-size: 0.82rem; letter-spacing: 0.2em; text-transform: uppercase;
   color: var(--ink); background: var(--accent);
   border: none; border-radius: var(--radius);
-  padding: 16px 20px;
+  padding: 19px 20px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s, background 0.2s;
-  box-shadow: 0 4px 24px rgba(212,240,80,0.25);
+  transition: transform 0.12s, background 0.2s, box-shadow 0.2s;
+  box-shadow:
+    0 0 0 2px rgba(212,240,80,0.18),
+    0 4px 20px rgba(212,240,80,0.45),
+    0 8px 48px rgba(212,240,80,0.28);
+  animation: green-pulse 2.8s ease-in-out infinite;
+}
+@keyframes green-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(212,240,80,0.18), 0 4px 20px rgba(212,240,80,0.45), 0 8px 48px rgba(212,240,80,0.28); }
+  50%       { box-shadow: 0 0 0 4px rgba(212,240,80,0.10), 0 4px 28px rgba(212,240,80,0.65), 0 12px 64px rgba(212,240,80,0.38); }
 }
 #btn-track:active  { transform: scale(0.97); }
-#btn-track.active  { background: var(--red); color: #fff; box-shadow: 0 4px 24px rgba(240,80,80,0.25); }
-#btn-track:disabled{ opacity: 0.2; pointer-events: none; box-shadow: none; }
+#btn-track.active  {
+  background: var(--red); color: #fff;
+  box-shadow: 0 4px 20px rgba(240,80,80,0.4), 0 8px 40px rgba(240,80,80,0.2);
+  animation: none;
+}
+#btn-track:disabled{ opacity: 0.2; pointer-events: none; box-shadow: none; animation: none; }
 
 #btn-clear {
   font-family: 'DM Mono', monospace; font-size: 0.58rem;
@@ -458,6 +470,7 @@ html, body { height: 100%; background: var(--ink); font-family: 'DM Mono', monos
   let tracking    = false;
   let followMode  = true;
   let placingMode = false;
+  let ignoreNextMapClick = false;
   let watchId     = null;
   let intervalId  = null;
   let timerTick   = null;
@@ -710,10 +723,13 @@ html, body { height: 100%; background: var(--ink); font-family: 'DM Mono', monos
     btnPlaces.classList.toggle('active-fab', placingMode);
     map.getCanvas().style.cursor = placingMode ? 'crosshair' : '';
     if (!placingMode) closePlaceSheet();
+    // Ignore the very next map click — it's the same tap that activated this button
+    if (placingMode) ignoreNextMapClick = true;
   });
 
   map.on('click', e => {
     hidePopup();
+    if (ignoreNextMapClick) { ignoreNextMapClick = false; return; }
     if (!placingMode) return;
     pendingLngLat = e.lngLat;
     placeInput.value = '';
