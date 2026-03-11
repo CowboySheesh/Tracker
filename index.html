@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>FOOTPRINT</title>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+```
+:root {
+  --ink: #0a0a0f;
+  --paper: #f0ede6;
+  --accent: #e8ff47;
+  --dim: rgba(240,237,230,0.08);
+  --glass: rgba(10,10,15,0.72);
+}
+
+html, body {
+  height: 100%;
+  background: var(--ink);
+  font-family: 'Space Mono', monospace;
+  color: var(--paper);
+  overflow: hidden;
+}
+
+#map {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── HUD HEADER ── */
+#hud {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  padding: 18px 22px 14px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(10,10,15,0.92) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+#wordmark {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.35rem;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+#wordmark span {
+  display: block;
+  font-size: 0.48rem;
+  letter-spacing: 0.38em;
+  color: rgba(240,237,230,0.4);
+  font-weight: 400;
+  margin-top: 3px;
+}
+
+#stats-row {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.stat {
+  text-align: right;
+}
+
+.stat-val {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--paper);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.48rem;
+  letter-spacing: 0.2em;
+  color: rgba(240,237,230,0.35);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* ── STATUS PILL ── */
+#status-pill {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  background: var(--glass);
+  border: 1px solid rgba(240,237,230,0.12);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 4px;
+  padding: 28px 36px;
+  text-align: center;
+  max-width: 300px;
+  width: 88vw;
+  display: none;
+}
+
+#status-pill.visible { display: block; }
+
+#status-pill h2 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+#status-pill p {
+  font-size: 0.7rem;
+  color: rgba(240,237,230,0.55);
+  line-height: 1.7;
+  letter-spacing: 0.04em;
+}
+
+/* ── BOTTOM CONTROLS ── */
+#controls {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 10;
+  padding: 20px 22px 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  background: linear-gradient(to top, rgba(10,10,15,0.88) 0%, transparent 100%);
+}
+
+#btn-track {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--accent);
+  border: none;
+  border-radius: 3px;
+  padding: 14px 28px;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#btn-track:active { transform: scale(0.96); opacity: 0.88; }
+#btn-track.active { background: #ff4747; color: #fff; }
+
+#btn-clear {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(240,237,230,0.35);
+  background: transparent;
+  border: 1px solid rgba(240,237,230,0.15);
+  border-radius: 3px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#btn-clear:hover { color: var(--paper); border-color: rgba(240,237,230,0.4); }
+
+/* ── PULSE DOT ── */
+.pulse-marker {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 0 rgba(232,255,71,0.6);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(232,255,71,0.6); }
+  70%  { box-shadow: 0 0 0 12px rgba(232,255,71,0); }
+  100% { box-shadow: 0 0 0 0 rgba(232,255,71,0); }
+}
+
+/* ── FOLLOW BUTTON ── */
+#btn-follow {
+  position: fixed;
+  bottom: 110px;
+  right: 22px;
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(240,237,230,0.2);
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: border-color 0.2s, background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#btn-follow.locked {
+  border-color: var(--accent);
+  background: rgba(232,255,71,0.15);
+}
+
+/* ── DWELL BADGE ── */
+#dwell-badge {
+  position: fixed;
+  bottom: 110px;
+  left: 22px;
+  z-index: 10;
+  background: var(--glass);
+  border: 1px solid rgba(240,237,230,0.1);
+  backdrop-filter: blur(12px);
+  border-radius: 3px;
+  padding: 8px 14px;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  color: rgba(240,237,230,0.5);
+  display: none;
+}
+
+#dwell-badge.visible { display: block; }
+#dwell-badge strong { color: var(--accent); font-family: 'Syne', sans-serif; }
+```
+
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- HUD -->
+
+<div id="hud">
+  <div id="wordmark">
+    Footprint
+    <span>daily location trail</span>
+  </div>
+  <div id="stats-row">
+    <div class="stat">
+      <div class="stat-val" id="stat-pts">0</div>
+      <div class="stat-label">Points</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="stat-dist">0.0</div>
+      <div class="stat-label">km</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="stat-time">00:00</div>
+      <div class="stat-label">Elapsed</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+
+<div id="status-pill" class="visible">
+  <h2>FOOTPRINT</h2>
+  <p>Tap <strong style="color:var(--paper)">START TRACKING</strong> to begin recording your trail. Your path will draw itself as you move. Denser lines show where you lingered.</p>
+</div>
+
+<!-- FOLLOW BUTTON -->
+
+<button id="btn-follow" class="locked" title="Follow me">📍</button>
+
+<!-- DWELL BADGE -->
+
+<div id="dwell-badge" id="dwell-badge">
+  Dwell: <strong id="dwell-val">—</strong>
+</div>
+
+<!-- BOTTOM CONTROLS -->
+
+<div id="controls">
+  <button id="btn-clear">Clear Trail</button>
+  <button id="btn-track">Start Tracking</button>
+</div>
+
+<script>
+  // ── CONFIG ──
+  const MAPBOX_TOKEN = 'pk.eyJ1IjoidW5jb21tb25jb3dib3kiLCJhIjoiY21rNjN2c2R1MHFodjNkb2wybWxweGNvNyJ9.4j78jvsPEWDh-T19ZSeqMA';
+  const STORAGE_KEY  = 'footprint_trail_v1';
+  const INTERVAL_MS  = 8000;   // record point every 8 seconds
+  const DWELL_RADIUS = 0.00015; // ~15m in degrees — counts as "same spot"
+
+  // ── STATE ──
+  let tracking    = false;
+  let followMode  = true;   // map follows your position by default
+  let watchId     = null;
+  let intervalId  = null;
+  let points      = [];        // [{lng, lat, ts}]
+  let segments    = [];        // [{coords:[], weight}] — for dwell density
+  let startTime   = null;
+  let timerTick   = null;
+  let pulseMarker = null;
+  let currentPos  = null;
+  let dwellCount  = {};        // grid cell → count
+
+  // ── LOAD SAVED ──
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) { points = JSON.parse(saved); }
+  } catch(e) {}
+
+  // ── MAP INIT ──
+  mapboxgl.accessToken = MAPBOX_TOKEN;
+
+  const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/dark-v11',
+    center: [-80.19, 25.77],
+    zoom: 14,
+    pitch: 0,
+    attributionControl: false
+  });
+
+  map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-right');
+
+  map.on('load', () => {
+    initSources();
+    if (points.length > 1) {
+      renderTrail();
+      flyToTrail();
+    }
+    updateStats();
+  });
+
+  // ── SOURCES & LAYERS ──
+  function initSources() {
+    map.addSource('trail', {
+      type: 'geojson',
+      data: emptyFC()
+    });
+
+    // Base trail line
+    map.addLayer({
+      id: 'trail-line',
+      type: 'line',
+      source: 'trail',
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: {
+        'line-color': '#e8ff47',
+        'line-width': ['get', 'weight'],
+        'line-opacity': 0.72
+      }
+    });
+
+    // Glow layer
+    map.addLayer({
+      id: 'trail-glow',
+      type: 'line',
+      source: 'trail',
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: {
+        'line-color': '#e8ff47',
+        'line-width': ['*', ['get', 'weight'], 3.5],
+        'line-opacity': 0.08,
+        'line-blur': 8
+      }
+    }, 'trail-line');
+
+    map.addSource('dwell-pts', {
+      type: 'geojson',
+      data: emptyFC()
+    });
+
+    // Dwell circle blooms
+    map.addLayer({
+      id: 'dwell-circles',
+      type: 'circle',
+      source: 'dwell-pts',
+      paint: {
+        'circle-radius': ['interpolate', ['linear'], ['get', 'count'], 1, 8, 10, 40],
+        'circle-color': '#e8ff47',
+        'circle-opacity': ['interpolate', ['linear'], ['get', 'count'], 1, 0.06, 10, 0.22],
+        'circle-blur': 1.2
+      }
+    }, 'trail-glow');
+  }
+
+  function emptyFC() {
+    return { type: 'FeatureCollection', features: [] };
+  }
+
+  // ── RENDER TRAIL ──
+  function renderTrail() {
+    if (points.length < 2) return;
+
+    const lineFeatures = [];
+    const dwellMap     = {};
+
+    // Build weighted segments
+    for (let i = 0; i < points.length - 1; i++) {
+      const a = points[i];
+      const b = points[i + 1];
+      const key = dwellKey(a);
+      dwellMap[key] = (dwellMap[key] || 0) + 1;
+
+      lineFeatures.push({
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: [[a.lng, a.lat], [b.lng, b.lat]]
+        },
+        properties: {
+          weight: Math.min(2 + (dwellMap[key] || 1) * 0.9, 14)
+        }
+      });
+    }
+
+    map.getSource('trail').setData({
+      type: 'FeatureCollection',
+      features: lineFeatures
+    });
+
+    // Dwell bloom circles
+    const dwellFeatures = Object.entries(dwellMap).map(([key, count]) => {
+      const [lat, lng] = key.split(',').map(Number);
+      return {
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [lng, lat] },
+        properties: { count }
+      };
+    });
+
+    map.getSource('dwell-pts').setData({
+      type: 'FeatureCollection',
+      features: dwellFeatures
+    });
+
+    // Update dwell badge
+    const maxDwell = Math.max(...Object.values(dwellMap));
+    if (maxDwell > 2) {
+      document.getElementById('dwell-badge').classList.add('visible');
+      document.getElementById('dwell-val').textContent = `${maxDwell} passes`;
+    }
+  }
+
+  function dwellKey(pt) {
+    // Snap to grid cell ~15m
+    const r = 0.00015;
+    return `${(Math.round(pt.lat / r) * r).toFixed(5)},${(Math.round(pt.lng / r) * r).toFixed(5)}`;
+  }
+
+  function flyToTrail() {
+    if (!points.length) return;
+    const last = points[points.length - 1];
+    map.flyTo({ center: [last.lng, last.lat], zoom: 15, duration: 1200 });
+  }
+
+  // ── TRACKING ──
+  document.getElementById('btn-track').addEventListener('click', toggleTracking);
+
+  function toggleTracking() {
+    if (!tracking) startTracking();
+    else stopTracking();
+  }
+
+  function startTracking() {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    document.getElementById('status-pill').classList.remove('visible');
+    tracking = true;
+    startTime = startTime || Date.now();
+    document.getElementById('btn-track').textContent = 'Stop Tracking';
+    document.getElementById('btn-track').classList.add('active');
+
+    // Start timer
+    timerTick = setInterval(updateTimer, 1000);
+
+    // Watch position for live marker
+    watchId = navigator.geolocation.watchPosition(onPosition, onGeoError, {
+      enableHighAccuracy: true,
+      maximumAge: 3000
+    });
+
+    // Record point on interval
+    intervalId = setInterval(() => {
+      if (currentPos) recordPoint(currentPos);
+    }, INTERVAL_MS);
+
+    // Record first point immediately
+    navigator.geolocation.getCurrentPosition(pos => {
+      currentPos = pos;
+      recordPoint(pos);
+      map.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: 16, duration: 800 });
+    }, onGeoError, { enableHighAccuracy: true });
+  }
+
+  function stopTracking() {
+    tracking = false;
+    if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+    if (intervalId)       clearInterval(intervalId);
+    if (timerTick)        clearInterval(timerTick);
+    document.getElementById('btn-track').textContent = 'Resume Tracking';
+    document.getElementById('btn-track').classList.remove('active');
+  }
+
+  function onPosition(pos) {
+    currentPos = pos;
+    const { longitude: lng, latitude: lat } = pos.coords;
+
+    // Move pulse marker
+    if (!pulseMarker) {
+      const el = document.createElement('div');
+      el.className = 'pulse-marker';
+      pulseMarker = new mapboxgl.Marker({ element: el }).setLngLat([lng, lat]).addTo(map);
+    } else {
+      pulseMarker.setLngLat([lng, lat]);
+    }
+
+    // Follow mode — smoothly pan map to keep trail head on screen
+    if (followMode) {
+      map.easeTo({ center: [lng, lat], duration: 800, easing: t => t });
+    }
+  }
+
+  // ── FOLLOW BUTTON ──
+  const btnFollow = document.getElementById('btn-follow');
+  btnFollow.addEventListener('click', () => {
+    followMode = !followMode;
+    btnFollow.classList.toggle('locked', followMode);
+    btnFollow.textContent = followMode ? '📍' : '🗺️';
+    // If re-enabling follow, snap back immediately
+    if (followMode && currentPos) {
+      map.easeTo({
+        center: [currentPos.coords.longitude, currentPos.coords.latitude],
+        duration: 600
+      });
+    }
+  });
+
+  // When user manually pans the map, turn off follow mode
+  map.on('dragstart', () => {
+    if (followMode) {
+      followMode = false;
+      btnFollow.classList.remove('locked');
+      btnFollow.textContent = '🗺️';
+    }
+  });
+
+  function recordPoint(pos) {
+    const { longitude: lng, latitude: lat } = pos.coords;
+    points.push({ lng, lat, ts: Date.now() });
+    savePoints();
+    renderTrail();
+    updateStats();
+  }
+
+  function onGeoError(err) {
+    console.warn('Geo error:', err.message);
+  }
+
+  // ── CLEAR ──
+  document.getElementById('btn-clear').addEventListener('click', () => {
+    if (!confirm('Clear your entire trail?')) return;
+    points = [];
+    savePoints();
+    map.getSource('trail')?.setData(emptyFC());
+    map.getSource('dwell-pts')?.setData(emptyFC());
+    document.getElementById('dwell-badge').classList.remove('visible');
+    startTime = null;
+    updateStats();
+    document.getElementById('stat-time').textContent = '00:00';
+    document.getElementById('status-pill').classList.add('visible');
+    if (tracking) stopTracking();
+    document.getElementById('btn-track').textContent = 'Start Tracking';
+  });
+
+  // ── SAVE ──
+  function savePoints() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(points)); } catch(e) {}
+  }
+
+  // ── STATS ──
+  function updateStats() {
+    document.getElementById('stat-pts').textContent = points.length;
+    document.getElementById('stat-dist').textContent = calcDistance().toFixed(2);
+  }
+
+  function calcDistance() {
+    let d = 0;
+    for (let i = 1; i < points.length; i++) {
+      d += haversine(points[i - 1], points[i]);
+    }
+    return d;
+  }
+
+  function haversine(a, b) {
+    const R = 6371;
+    const dLat = (b.lat - a.lat) * Math.PI / 180;
+    const dLng = (b.lng - a.lng) * Math.PI / 180;
+    const x = Math.sin(dLat/2)**2 +
+              Math.cos(a.lat * Math.PI/180) * Math.cos(b.lat * Math.PI/180) *
+              Math.sin(dLng/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
+  }
+
+  function updateTimer() {
+    if (!startTime) return;
+    const secs = Math.floor((Date.now() - startTime) / 1000);
+    const m = String(Math.floor(secs / 60)).padStart(2, '0');
+    const s = String(secs % 60).padStart(2, '0');
+    document.getElementById('stat-time').textContent = `${m}:${s}`;
+  }
+</script>
+
+</body>
+</html>
