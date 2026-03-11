@@ -16,8 +16,8 @@
   --ink: #0a0a0f;
   --paper: #f0ede6;
   --accent: #e8ff47;
-  --dim: rgba(240,237,230,0.08);
-  --glass: rgba(10,10,15,0.72);
+  --red: #ff4747;
+  --glass: rgba(10,10,15,0.78);
 }
 
 html, body {
@@ -28,30 +28,25 @@ html, body {
   overflow: hidden;
 }
 
-#map {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
+#map { position: fixed; inset: 0; }
 
-/* ── HUD HEADER ── */
+/* ── HUD ── */
 #hud {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 10;
-  padding: 18px 22px 14px;
+  padding: 16px 18px 12px;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  background: linear-gradient(to bottom, rgba(10,10,15,0.92) 0%, transparent 100%);
+  background: linear-gradient(to bottom, rgba(10,10,15,0.95) 0%, transparent 100%);
   pointer-events: none;
 }
 
 #wordmark {
   font-family: 'Syne', sans-serif;
   font-weight: 800;
-  font-size: 1.35rem;
+  font-size: 1.2rem;
   letter-spacing: 0.18em;
   color: var(--accent);
   text-transform: uppercase;
@@ -60,148 +55,111 @@ html, body {
 
 #wordmark span {
   display: block;
-  font-size: 0.48rem;
-  letter-spacing: 0.38em;
-  color: rgba(240,237,230,0.4);
+  font-size: 0.42rem;
+  letter-spacing: 0.35em;
+  color: rgba(240,237,230,0.35);
   font-weight: 400;
   margin-top: 3px;
 }
 
-#stats-row {
-  display: flex;
-  gap: 18px;
-  align-items: flex-start;
-}
-
-.stat {
-  text-align: right;
-}
+#stats-row { display: flex; gap: 14px; align-items: flex-start; }
+.stat { text-align: right; }
 
 .stat-val {
   font-family: 'Syne', sans-serif;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--paper);
   line-height: 1;
+  transition: color 0.3s;
 }
 
+.stat-val.dim { color: rgba(240,237,230,0.35); }
+
 .stat-label {
-  font-size: 0.48rem;
-  letter-spacing: 0.2em;
-  color: rgba(240,237,230,0.35);
+  font-size: 0.42rem;
+  letter-spacing: 0.18em;
+  color: rgba(240,237,230,0.3);
   text-transform: uppercase;
   margin-top: 2px;
 }
 
-/* ── STATUS PILL ── */
-#status-pill {
+/* ── DAY STRIP ── */
+#day-strip {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 20;
-  background: var(--glass);
-  border: 1px solid rgba(240,237,230,0.12);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border-radius: 4px;
-  padding: 28px 36px;
-  text-align: center;
-  max-width: 300px;
-  width: 88vw;
-  display: none;
-}
-
-#status-pill.visible { display: block; }
-
-#status-pill h2 {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 1.1rem;
-  letter-spacing: 0.12em;
-  color: var(--accent);
-  margin-bottom: 10px;
-}
-
-#status-pill p {
-  font-size: 0.7rem;
-  color: rgba(240,237,230,0.55);
-  line-height: 1.7;
-  letter-spacing: 0.04em;
-}
-
-/* ── BOTTOM CONTROLS ── */
-#controls {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
+  top: 62px;
+  left: 0; right: 0;
   z-index: 10;
-  padding: 20px 22px 36px;
+  padding: 0 18px 8px;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  background: linear-gradient(to top, rgba(10,10,15,0.88) 0%, transparent 100%);
+  gap: 7px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
 
-#btn-track {
+#day-strip::-webkit-scrollbar { display: none; }
+
+.day-chip {
+  flex-shrink: 0;
   font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 0.78rem;
-  letter-spacing: 0.22em;
+  font-weight: 700;
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(240,237,230,0.14);
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: rgba(240,237,230,0.4);
+  cursor: pointer;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.15s;
+}
+
+.day-chip.has-data {
+  border-color: rgba(232,255,71,0.28);
+  color: rgba(240,237,230,0.65);
+}
+
+.day-chip.active {
+  background: var(--accent);
   color: var(--ink);
-  background: var(--accent);
-  border: none;
-  border-radius: 3px;
-  padding: 14px 28px;
-  cursor: pointer;
-  transition: transform 0.15s, opacity 0.15s;
-  -webkit-tap-highlight-color: transparent;
+  border-color: var(--accent);
 }
 
-#btn-track:active { transform: scale(0.96); opacity: 0.88; }
-#btn-track.active { background: #ff4747; color: #fff; }
-
-#btn-clear {
-  font-family: 'Space Mono', monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.12em;
+/* ── PAST DAY BANNER ── */
+#past-banner {
+  position: fixed;
+  top: 108px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 11;
+  background: rgba(255,71,71,0.12);
+  border: 1px solid rgba(255,71,71,0.3);
+  backdrop-filter: blur(10px);
+  border-radius: 3px;
+  padding: 5px 14px;
+  font-size: 0.52rem;
+  letter-spacing: 0.16em;
+  color: var(--red);
   text-transform: uppercase;
-  color: rgba(240,237,230,0.35);
-  background: transparent;
-  border: 1px solid rgba(240,237,230,0.15);
-  border-radius: 3px;
-  padding: 10px 18px;
-  cursor: pointer;
-  transition: color 0.2s, border-color 0.2s;
-  -webkit-tap-highlight-color: transparent;
+  display: none;
+  white-space: nowrap;
 }
 
-#btn-clear:hover { color: var(--paper); border-color: rgba(240,237,230,0.4); }
+#past-banner.visible { display: block; }
 
-/* ── PULSE DOT ── */
-.pulse-marker {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 0 rgba(232,255,71,0.6);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(232,255,71,0.6); }
-  70%  { box-shadow: 0 0 0 12px rgba(232,255,71,0); }
-  100% { box-shadow: 0 0 0 0 rgba(232,255,71,0); }
-}
-
-/* ── FOLLOW BUTTON ── */
+/* ── FOLLOW ── */
 #btn-follow {
   position: fixed;
-  bottom: 110px;
-  right: 22px;
+  bottom: 118px;
+  right: 18px;
   z-index: 10;
-  width: 44px;
-  height: 44px;
+  width: 44px; height: 44px;
   border-radius: 50%;
   border: 1px solid rgba(240,237,230,0.2);
   background: var(--glass);
@@ -218,28 +176,128 @@ html, body {
 
 #btn-follow.locked {
   border-color: var(--accent);
-  background: rgba(232,255,71,0.15);
+  background: rgba(232,255,71,0.14);
 }
 
-/* ── DWELL BADGE ── */
+/* ── DWELL ── */
 #dwell-badge {
   position: fixed;
-  bottom: 110px;
-  left: 22px;
+  bottom: 118px;
+  left: 18px;
   z-index: 10;
   background: var(--glass);
   border: 1px solid rgba(240,237,230,0.1);
   backdrop-filter: blur(12px);
   border-radius: 3px;
-  padding: 8px 14px;
-  font-size: 0.6rem;
-  letter-spacing: 0.14em;
-  color: rgba(240,237,230,0.5);
+  padding: 7px 12px;
+  font-size: 0.56rem;
+  letter-spacing: 0.12em;
+  color: rgba(240,237,230,0.45);
   display: none;
 }
 
 #dwell-badge.visible { display: block; }
 #dwell-badge strong { color: var(--accent); font-family: 'Syne', sans-serif; }
+
+/* ── CONTROLS ── */
+#controls {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 10;
+  padding: 16px 18px 34px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 10px;
+  background: linear-gradient(to top, rgba(10,10,15,0.92) 0%, transparent 100%);
+}
+
+#btn-track {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--accent);
+  border: none;
+  border-radius: 3px;
+  padding: 13px 24px;
+  cursor: pointer;
+  flex: 1;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s;
+}
+
+#btn-track:active { transform: scale(0.96); }
+#btn-track.active { background: var(--red); color: #fff; }
+#btn-track:disabled { opacity: 0.25; pointer-events: none; }
+
+#btn-clear {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(240,237,230,0.28);
+  background: transparent;
+  border: 1px solid rgba(240,237,230,0.12);
+  border-radius: 3px;
+  padding: 10px 14px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+}
+
+#btn-clear:disabled { opacity: 0.15; pointer-events: none; }
+
+/* ── PULSE ── */
+.pulse-marker {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(232,255,71,0.6); }
+  70%  { box-shadow: 0 0 0 12px rgba(232,255,71,0); }
+  100% { box-shadow: 0 0 0 0 rgba(232,255,71,0); }
+}
+
+/* ── WELCOME ── */
+#welcome {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  background: var(--glass);
+  border: 1px solid rgba(240,237,230,0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 4px;
+  padding: 28px 30px;
+  text-align: center;
+  max-width: 290px;
+  width: 86vw;
+  display: none;
+}
+
+#welcome.visible { display: block; }
+
+#welcome h2 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+#welcome p {
+  font-size: 0.63rem;
+  color: rgba(240,237,230,0.48);
+  line-height: 1.8;
+}
 ```
 
   </style>
@@ -248,80 +306,88 @@ html, body {
 
 <div id="map"></div>
 
-<!-- HUD -->
-
 <div id="hud">
-  <div id="wordmark">
-    Footprint
-    <span>daily location trail</span>
-  </div>
+  <div id="wordmark">Footprint<span>daily location trail</span></div>
   <div id="stats-row">
-    <div class="stat">
-      <div class="stat-val" id="stat-pts">0</div>
-      <div class="stat-label">Points</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="stat-dist">0.0</div>
-      <div class="stat-label">km</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="stat-time">00:00</div>
-      <div class="stat-label">Elapsed</div>
-    </div>
+    <div class="stat"><div class="stat-val" id="stat-pts">0</div><div class="stat-label">Points</div></div>
+    <div class="stat"><div class="stat-val" id="stat-dist">0.0</div><div class="stat-label">km</div></div>
+    <div class="stat"><div class="stat-val" id="stat-time">00:00</div><div class="stat-label">Time</div></div>
   </div>
 </div>
 
-<!-- MODAL -->
+<div id="day-strip"></div>
+<div id="past-banner">Viewing past trail — read only</div>
+<button id="btn-follow" class="locked">📍</button>
+<div id="dwell-badge">Dwell: <strong id="dwell-val">—</strong></div>
 
-<div id="status-pill" class="visible">
+<div id="welcome" class="visible">
   <h2>FOOTPRINT</h2>
-  <p>Tap <strong style="color:var(--paper)">START TRACKING</strong> to begin recording your trail. Your path will draw itself as you move. Denser lines show where you lingered.</p>
+  <p>Tap <strong style="color:var(--paper)">START TRACKING</strong> to record today's trail.<br><br>Each day saves separately. Tap the chips above to replay any past day.</p>
 </div>
-
-<!-- FOLLOW BUTTON -->
-
-<button id="btn-follow" class="locked" title="Follow me">📍</button>
-
-<!-- DWELL BADGE -->
-
-<div id="dwell-badge" id="dwell-badge">
-  Dwell: <strong id="dwell-val">—</strong>
-</div>
-
-<!-- BOTTOM CONTROLS -->
 
 <div id="controls">
-  <button id="btn-clear">Clear Trail</button>
+  <button id="btn-clear">Clear Day</button>
   <button id="btn-track">Start Tracking</button>
 </div>
 
 <script>
   // ── CONFIG ──
   const MAPBOX_TOKEN = 'pk.eyJ1IjoidW5jb21tb25jb3dib3kiLCJhIjoiY21rNjN2c2R1MHFodjNkb2wybWxweGNvNyJ9.4j78jvsPEWDh-T19ZSeqMA';
-  const STORAGE_KEY  = 'footprint_trail_v1';
-  const INTERVAL_MS  = 8000;   // record point every 8 seconds
-  const DWELL_RADIUS = 0.00015; // ~15m in degrees — counts as "same spot"
+  const INTERVAL_MS  = 8000;
+  const MAX_DAYS     = 14;
+
+  // ── DATE HELPERS ──
+  function todayKey() {
+    const d = new Date();
+    return `fp_${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  }
+
+  function pad(n) { return String(n).padStart(2,'0'); }
+
+  function keyToLabel(key) {
+    const [y,m,d] = key.replace('fp_','').split('-').map(Number);
+    const date = new Date(y, m-1, d);
+    const today = new Date(); today.setHours(0,0,0,0);
+    const diff = Math.round((today - date) / 86400000);
+    if (diff === 0) return 'Today';
+    if (diff === 1) return 'Yesterday';
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  function getAllDayKeys() {
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('fp_')) keys.push(k);
+    }
+    return keys.sort().reverse();
+  }
+
+  function loadDay(key) {
+    try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : []; }
+    catch(e) { return []; }
+  }
+
+  function saveDay(key, pts) {
+    try { localStorage.setItem(key, JSON.stringify(pts)); } catch(e) {}
+    // Prune old days
+    const keys = getAllDayKeys();
+    if (keys.length > MAX_DAYS) keys.slice(MAX_DAYS).forEach(k => localStorage.removeItem(k));
+  }
 
   // ── STATE ──
   let tracking    = false;
-  let followMode  = true;   // map follows your position by default
+  let followMode  = true;
   let watchId     = null;
   let intervalId  = null;
-  let points      = [];        // [{lng, lat, ts}]
-  let segments    = [];        // [{coords:[], weight}] — for dwell density
-  let startTime   = null;
   let timerTick   = null;
-  let pulseMarker = null;
+  let startTime   = null;
   let currentPos  = null;
-  let dwellCount  = {};        // grid cell → count
+  let pulseMarker = null;
+  let activeDay   = todayKey();
+  let points      = loadDay(activeDay);
 
-  // ── LOAD SAVED ──
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) { points = JSON.parse(saved); }
-  } catch(e) {}
-
-  // ── MAP INIT ──
+  // ── MAP ──
   mapboxgl.accessToken = MAPBOX_TOKEN;
 
   const map = new mapboxgl.Map({
@@ -329,7 +395,6 @@ html, body {
     style: 'mapbox://styles/mapbox/dark-v11',
     center: [-80.19, 25.77],
     zoom: 14,
-    pitch: 0,
     attributionControl: false
   });
 
@@ -337,171 +402,147 @@ html, body {
 
   map.on('load', () => {
     initSources();
-    if (points.length > 1) {
-      renderTrail();
-      flyToTrail();
-    }
+    buildDayStrip();
+    if (points.length > 1) { renderTrail(); flyToTrail(); }
+    else document.getElementById('welcome').classList.add('visible');
     updateStats();
   });
 
   // ── SOURCES & LAYERS ──
   function initSources() {
-    map.addSource('trail', {
-      type: 'geojson',
-      data: emptyFC()
-    });
+    map.addSource('trail', { type: 'geojson', data: emptyFC() });
 
-    // Base trail line
     map.addLayer({
-      id: 'trail-line',
-      type: 'line',
-      source: 'trail',
+      id: 'trail-glow', type: 'line', source: 'trail',
       layout: { 'line-cap': 'round', 'line-join': 'round' },
-      paint: {
-        'line-color': '#e8ff47',
-        'line-width': ['get', 'weight'],
-        'line-opacity': 0.72
-      }
+      paint: { 'line-color': '#e8ff47', 'line-width': ['*', ['get', 'weight'], 3.5], 'line-opacity': 0.08, 'line-blur': 8 }
     });
 
-    // Glow layer
     map.addLayer({
-      id: 'trail-glow',
-      type: 'line',
-      source: 'trail',
+      id: 'trail-line', type: 'line', source: 'trail',
       layout: { 'line-cap': 'round', 'line-join': 'round' },
-      paint: {
-        'line-color': '#e8ff47',
-        'line-width': ['*', ['get', 'weight'], 3.5],
-        'line-opacity': 0.08,
-        'line-blur': 8
-      }
-    }, 'trail-line');
-
-    map.addSource('dwell-pts', {
-      type: 'geojson',
-      data: emptyFC()
+      paint: { 'line-color': '#e8ff47', 'line-width': ['get', 'weight'], 'line-opacity': 0.75 }
     });
 
-    // Dwell circle blooms
+    map.addSource('dwell-pts', { type: 'geojson', data: emptyFC() });
+
     map.addLayer({
-      id: 'dwell-circles',
-      type: 'circle',
-      source: 'dwell-pts',
+      id: 'dwell-circles', type: 'circle', source: 'dwell-pts',
       paint: {
-        'circle-radius': ['interpolate', ['linear'], ['get', 'count'], 1, 8, 10, 40],
+        'circle-radius': ['interpolate', ['linear'], ['get', 'count'], 1, 8, 10, 42],
         'circle-color': '#e8ff47',
-        'circle-opacity': ['interpolate', ['linear'], ['get', 'count'], 1, 0.06, 10, 0.22],
+        'circle-opacity': ['interpolate', ['linear'], ['get', 'count'], 1, 0.05, 10, 0.2],
         'circle-blur': 1.2
       }
     }, 'trail-glow');
   }
 
-  function emptyFC() {
-    return { type: 'FeatureCollection', features: [] };
+  function emptyFC() { return { type: 'FeatureCollection', features: [] }; }
+
+  // ── DAY STRIP ──
+  function buildDayStrip() {
+    const strip = document.getElementById('day-strip');
+    strip.innerHTML = '';
+    const keys = getAllDayKeys();
+    if (!keys.includes(todayKey())) keys.unshift(todayKey());
+
+    keys.forEach(key => {
+      const chip = document.createElement('button');
+      chip.className = 'day-chip';
+      chip.textContent = keyToLabel(key);
+      chip.dataset.key = key;
+      if (loadDay(key).length > 0) chip.classList.add('has-data');
+      if (key === activeDay) chip.classList.add('active');
+      chip.addEventListener('click', () => switchDay(key));
+      strip.appendChild(chip);
+    });
+  }
+
+  function switchDay(key) {
+    if (tracking) stopTracking();
+    activeDay = key;
+    points    = loadDay(key);
+    startTime = null;
+
+    document.querySelectorAll('.day-chip').forEach(c =>
+      c.classList.toggle('active', c.dataset.key === key)
+    );
+
+    const isToday = key === todayKey();
+    document.getElementById('past-banner').classList.toggle('visible', !isToday);
+    document.getElementById('btn-track').disabled = !isToday;
+    document.getElementById('btn-clear').disabled = !isToday;
+    document.querySelectorAll('.stat-val').forEach(el => el.classList.toggle('dim', !isToday));
+
+    map.getSource('trail').setData(emptyFC());
+    map.getSource('dwell-pts').setData(emptyFC());
+    document.getElementById('dwell-badge').classList.remove('visible');
+    document.getElementById('stat-time').textContent = '00:00';
+
+    if (points.length > 1) { renderTrail(); flyToTrail(); }
+    updateStats();
   }
 
   // ── RENDER TRAIL ──
   function renderTrail() {
     if (points.length < 2) return;
-
     const lineFeatures = [];
-    const dwellMap     = {};
+    const dwellMap = {};
 
-    // Build weighted segments
     for (let i = 0; i < points.length - 1; i++) {
-      const a = points[i];
-      const b = points[i + 1];
-      const key = dwellKey(a);
-      dwellMap[key] = (dwellMap[key] || 0) + 1;
-
+      const a = points[i], b = points[i+1];
+      const k = dwellKey(a);
+      dwellMap[k] = (dwellMap[k] || 0) + 1;
       lineFeatures.push({
         type: 'Feature',
-        geometry: {
-          type: 'LineString',
-          coordinates: [[a.lng, a.lat], [b.lng, b.lat]]
-        },
-        properties: {
-          weight: Math.min(2 + (dwellMap[key] || 1) * 0.9, 14)
-        }
+        geometry: { type: 'LineString', coordinates: [[a.lng, a.lat], [b.lng, b.lat]] },
+        properties: { weight: Math.min(2 + (dwellMap[k] || 1) * 0.9, 14) }
       });
     }
 
-    map.getSource('trail').setData({
-      type: 'FeatureCollection',
-      features: lineFeatures
-    });
-
-    // Dwell bloom circles
-    const dwellFeatures = Object.entries(dwellMap).map(([key, count]) => {
-      const [lat, lng] = key.split(',').map(Number);
-      return {
-        type: 'Feature',
-        geometry: { type: 'Point', coordinates: [lng, lat] },
-        properties: { count }
-      };
-    });
+    map.getSource('trail').setData({ type: 'FeatureCollection', features: lineFeatures });
 
     map.getSource('dwell-pts').setData({
       type: 'FeatureCollection',
-      features: dwellFeatures
+      features: Object.entries(dwellMap).map(([k, count]) => {
+        const [lat, lng] = k.split(',').map(Number);
+        return { type: 'Feature', geometry: { type: 'Point', coordinates: [lng, lat] }, properties: { count } };
+      })
     });
 
-    // Update dwell badge
-    const maxDwell = Math.max(...Object.values(dwellMap));
-    if (maxDwell > 2) {
+    const max = Math.max(...Object.values(dwellMap));
+    if (max > 2) {
       document.getElementById('dwell-badge').classList.add('visible');
-      document.getElementById('dwell-val').textContent = `${maxDwell} passes`;
+      document.getElementById('dwell-val').textContent = `${max} passes`;
     }
   }
 
   function dwellKey(pt) {
-    // Snap to grid cell ~15m
     const r = 0.00015;
-    return `${(Math.round(pt.lat / r) * r).toFixed(5)},${(Math.round(pt.lng / r) * r).toFixed(5)}`;
+    return `${(Math.round(pt.lat/r)*r).toFixed(5)},${(Math.round(pt.lng/r)*r).toFixed(5)}`;
   }
 
   function flyToTrail() {
     if (!points.length) return;
-    const last = points[points.length - 1];
-    map.flyTo({ center: [last.lng, last.lat], zoom: 15, duration: 1200 });
+    const last = points[points.length-1];
+    map.flyTo({ center: [last.lng, last.lat], zoom: 15, duration: 1000 });
   }
 
   // ── TRACKING ──
-  document.getElementById('btn-track').addEventListener('click', toggleTracking);
-
-  function toggleTracking() {
-    if (!tracking) startTracking();
-    else stopTracking();
-  }
+  document.getElementById('btn-track').addEventListener('click', () => {
+    if (!tracking) startTracking(); else stopTracking();
+  });
 
   function startTracking() {
-    if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser.');
-      return;
-    }
-
-    document.getElementById('status-pill').classList.remove('visible');
-    tracking = true;
+    if (!navigator.geolocation) { alert('Geolocation not supported.'); return; }
+    document.getElementById('welcome').classList.remove('visible');
+    tracking  = true;
     startTime = startTime || Date.now();
     document.getElementById('btn-track').textContent = 'Stop Tracking';
     document.getElementById('btn-track').classList.add('active');
-
-    // Start timer
-    timerTick = setInterval(updateTimer, 1000);
-
-    // Watch position for live marker
-    watchId = navigator.geolocation.watchPosition(onPosition, onGeoError, {
-      enableHighAccuracy: true,
-      maximumAge: 3000
-    });
-
-    // Record point on interval
-    intervalId = setInterval(() => {
-      if (currentPos) recordPoint(currentPos);
-    }, INTERVAL_MS);
-
-    // Record first point immediately
+    timerTick  = setInterval(updateTimer, 1000);
+    watchId    = navigator.geolocation.watchPosition(onPosition, onGeoError, { enableHighAccuracy: true, maximumAge: 3000 });
+    intervalId = setInterval(() => { if (currentPos) recordPoint(currentPos); }, INTERVAL_MS);
     navigator.geolocation.getCurrentPosition(pos => {
       currentPos = pos;
       recordPoint(pos);
@@ -512,8 +553,8 @@ html, body {
   function stopTracking() {
     tracking = false;
     if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-    if (intervalId)       clearInterval(intervalId);
-    if (timerTick)        clearInterval(timerTick);
+    if (intervalId) clearInterval(intervalId);
+    if (timerTick) clearInterval(timerTick);
     document.getElementById('btn-track').textContent = 'Resume Tracking';
     document.getElementById('btn-track').classList.remove('active');
   }
@@ -521,8 +562,6 @@ html, body {
   function onPosition(pos) {
     currentPos = pos;
     const { longitude: lng, latitude: lat } = pos.coords;
-
-    // Move pulse marker
     if (!pulseMarker) {
       const el = document.createElement('div');
       el.className = 'pulse-marker';
@@ -530,29 +569,30 @@ html, body {
     } else {
       pulseMarker.setLngLat([lng, lat]);
     }
-
-    // Follow mode — smoothly pan map to keep trail head on screen
-    if (followMode) {
-      map.easeTo({ center: [lng, lat], duration: 800, easing: t => t });
-    }
+    if (followMode) map.easeTo({ center: [lng, lat], duration: 800 });
   }
 
-  // ── FOLLOW BUTTON ──
+  function recordPoint(pos) {
+    const { longitude: lng, latitude: lat } = pos.coords;
+    points.push({ lng, lat, ts: Date.now() });
+    saveDay(activeDay, points);
+    buildDayStrip();
+    renderTrail();
+    updateStats();
+  }
+
+  function onGeoError(err) { console.warn('Geo:', err.message); }
+
+  // ── FOLLOW ──
   const btnFollow = document.getElementById('btn-follow');
   btnFollow.addEventListener('click', () => {
     followMode = !followMode;
     btnFollow.classList.toggle('locked', followMode);
     btnFollow.textContent = followMode ? '📍' : '🗺️';
-    // If re-enabling follow, snap back immediately
-    if (followMode && currentPos) {
-      map.easeTo({
-        center: [currentPos.coords.longitude, currentPos.coords.latitude],
-        duration: 600
-      });
-    }
+    if (followMode && currentPos)
+      map.easeTo({ center: [currentPos.coords.longitude, currentPos.coords.latitude], duration: 600 });
   });
 
-  // When user manually pans the map, turn off follow mode
   map.on('dragstart', () => {
     if (followMode) {
       followMode = false;
@@ -561,50 +601,32 @@ html, body {
     }
   });
 
-  function recordPoint(pos) {
-    const { longitude: lng, latitude: lat } = pos.coords;
-    points.push({ lng, lat, ts: Date.now() });
-    savePoints();
-    renderTrail();
-    updateStats();
-  }
-
-  function onGeoError(err) {
-    console.warn('Geo error:', err.message);
-  }
-
   // ── CLEAR ──
   document.getElementById('btn-clear').addEventListener('click', () => {
-    if (!confirm('Clear your entire trail?')) return;
+    if (!confirm("Clear today's trail?")) return;
     points = [];
-    savePoints();
-    map.getSource('trail')?.setData(emptyFC());
-    map.getSource('dwell-pts')?.setData(emptyFC());
+    saveDay(activeDay, points);
+    map.getSource('trail').setData(emptyFC());
+    map.getSource('dwell-pts').setData(emptyFC());
     document.getElementById('dwell-badge').classList.remove('visible');
     startTime = null;
-    updateStats();
     document.getElementById('stat-time').textContent = '00:00';
-    document.getElementById('status-pill').classList.add('visible');
     if (tracking) stopTracking();
     document.getElementById('btn-track').textContent = 'Start Tracking';
+    document.getElementById('welcome').classList.add('visible');
+    buildDayStrip();
+    updateStats();
   });
-
-  // ── SAVE ──
-  function savePoints() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(points)); } catch(e) {}
-  }
 
   // ── STATS ──
   function updateStats() {
-    document.getElementById('stat-pts').textContent = points.length;
+    document.getElementById('stat-pts').textContent  = points.length;
     document.getElementById('stat-dist').textContent = calcDistance().toFixed(2);
   }
 
   function calcDistance() {
     let d = 0;
-    for (let i = 1; i < points.length; i++) {
-      d += haversine(points[i - 1], points[i]);
-    }
+    for (let i = 1; i < points.length; i++) d += haversine(points[i-1], points[i]);
     return d;
   }
 
@@ -612,18 +634,15 @@ html, body {
     const R = 6371;
     const dLat = (b.lat - a.lat) * Math.PI / 180;
     const dLng = (b.lng - a.lng) * Math.PI / 180;
-    const x = Math.sin(dLat/2)**2 +
-              Math.cos(a.lat * Math.PI/180) * Math.cos(b.lat * Math.PI/180) *
-              Math.sin(dLng/2)**2;
+    const x = Math.sin(dLat/2)**2 + Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
     return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
   }
 
   function updateTimer() {
     if (!startTime) return;
     const secs = Math.floor((Date.now() - startTime) / 1000);
-    const m = String(Math.floor(secs / 60)).padStart(2, '0');
-    const s = String(secs % 60).padStart(2, '0');
-    document.getElementById('stat-time').textContent = `${m}:${s}`;
+    document.getElementById('stat-time').textContent =
+      `${pad(Math.floor(secs/60))}:${pad(secs%60)}`;
   }
 </script>
 
