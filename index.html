@@ -13,16 +13,18 @@
 
 ```
 :root {
-  --ink:     #0d0d12;
-  --surface: #16161e;
-  --border:  rgba(255,255,255,0.09);
-  --paper:   #e8e4db;
-  --muted:   rgba(232,228,219,0.38);
-  --accent:  #d4f050;
+  --ink:     #0b0b10;
+  --surface: #13131a;
+  --card:    #1a1a24;
+  --border:  rgba(255,255,255,0.10);
+  --paper:   #edeae0;
+  --muted:   rgba(237,234,224,0.40);
+  --accent:  #c8f000;   /* bright lime — the GO color */
+  --glow:    rgba(200,240,0,0.55);
   --amber:   #f0a030;
   --red:     #f05050;
-  --glass:   rgba(13,13,18,0.80);
-  --radius:  10px;
+  --glass:   rgba(11,11,16,0.72);
+  --radius:  12px;
 }
 
 html, body {
@@ -33,63 +35,54 @@ html, body {
   overflow: hidden;
 }
 
-/* MAP — always full screen behind everything */
-#map {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-}
-
-/* All UI layers sit above the map */
-#hud, #day-wrap, #past-banner,
-#btn-follow, #btn-units, #btn-places,
-#dwell-badge, #controls,
-#place-sheet, #place-popup { z-index: 10; }
-
-/* Welcome sits on top but only covers its own footprint — map shows around it */
-#welcome { z-index: 15; }
-#place-sheet { z-index: 20; }
+/* ── MAP always full-screen behind everything ── */
+#map { position: fixed; inset: 0; z-index: 0; }
 
 /* ── HEADER ── */
 #hud {
-  position: fixed; top: 0; left: 0; right: 0;
-  padding: 16px 16px 0;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+  padding: 14px 14px 0;
   pointer-events: none;
 }
 
 #hud-inner {
-  background: var(--glass);
-  border: 1px solid var(--border);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(11,11,16,0.78);
+  border: 1px solid rgba(200,240,0,0.18);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border-radius: var(--radius);
-  padding: 12px 16px;
+  padding: 11px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   pointer-events: all;
+  /* subtle green top glow on the card */
+  box-shadow: 0 0 0 1px rgba(200,240,0,0.08), 0 -2px 20px rgba(200,240,0,0.06) inset;
 }
 
 #wordmark {
   font-family: 'Syne', sans-serif;
   font-weight: 800;
   font-size: 1rem;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.22em;
   color: var(--accent);
   text-transform: uppercase;
   line-height: 1;
+  text-shadow: 0 0 18px rgba(200,240,0,0.4);
 }
 
 #wordmark span {
   display: block;
   font-family: 'DM Mono', monospace;
-  font-size: 0.4rem;
-  letter-spacing: 0.3em;
+  font-size: 0.38rem;
+  letter-spacing: 0.32em;
   color: var(--muted);
   margin-top: 4px;
+  text-shadow: none;
 }
 
-#stats-row { display: flex; gap: 16px; }
+#stats-row { display: flex; gap: 18px; align-items: center; }
+
 .stat { text-align: right; }
 
 .stat-val {
@@ -100,11 +93,12 @@ html, body {
   line-height: 1;
   transition: color 0.25s;
 }
-.stat-val.dim { color: var(--muted); }
+.stat-val.live { color: var(--accent); text-shadow: 0 0 12px rgba(200,240,0,0.5); }
+.stat-val.dim  { color: var(--muted); text-shadow: none; }
 
 .stat-label {
   font-size: 0.38rem;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   color: var(--muted);
   text-transform: uppercase;
   margin-top: 3px;
@@ -112,8 +106,8 @@ html, body {
 
 /* ── DAY STRIP ── */
 #day-wrap {
-  position: fixed; top: 80px; left: 0; right: 0;
-  padding: 0 16px;
+  position: fixed; top: 78px; left: 0; right: 0; z-index: 10;
+  padding: 0 14px;
 }
 
 #day-strip {
@@ -126,35 +120,39 @@ html, body {
 
 .day-chip {
   flex-shrink: 0;
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 0.52rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-family: 'Syne', sans-serif; font-weight: 700;
+  font-size: 0.52rem; letter-spacing: 0.1em; text-transform: uppercase;
   padding: 7px 13px;
   border-radius: 20px;
-  border: 1px solid var(--border);
-  background: var(--glass);
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(11,11,16,0.75);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: var(--muted);
-  cursor: pointer;
-  white-space: nowrap;
+  cursor: pointer; white-space: nowrap;
   -webkit-tap-highlight-color: transparent;
   transition: all 0.15s;
 }
-.day-chip.has-data { border-color: rgba(212,240,80,0.25); color: rgba(232,228,219,0.7); }
-.day-chip.active   { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+.day-chip.has-data {
+  border-color: rgba(200,240,0,0.28);
+  color: rgba(237,234,224,0.75);
+}
+.day-chip.active {
+  background: var(--accent);
+  color: var(--ink);
+  border-color: var(--accent);
+  box-shadow: 0 2px 12px rgba(200,240,0,0.4);
+}
 
 /* ── PAST BANNER ── */
 #past-banner {
-  position: fixed; top: 126px; left: 50%; transform: translateX(-50%);
+  position: fixed; top: 122px; left: 50%; transform: translateX(-50%); z-index: 10;
   background: rgba(240,80,80,0.12);
-  border: 1px solid rgba(240,80,80,0.3);
+  border: 1px solid rgba(240,80,80,0.32);
   backdrop-filter: blur(8px);
   border-radius: 6px;
   padding: 5px 14px;
-  font-size: 0.48rem; letter-spacing: 0.16em;
+  font-size: 0.46rem; letter-spacing: 0.16em;
   color: var(--red); text-transform: uppercase;
   display: none; white-space: nowrap;
 }
@@ -162,11 +160,10 @@ html, body {
 
 /* ── FABs ── */
 .fab {
-  position: fixed;
-  width: 46px; height: 46px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--glass);
+  position: fixed; z-index: 10;
+  width: 46px; height: 46px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(11,11,16,0.80);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   cursor: pointer;
@@ -175,27 +172,31 @@ html, body {
   -webkit-tap-highlight-color: transparent;
   transition: border-color 0.2s, background 0.2s, transform 0.12s;
 }
-.fab:active { transform: scale(0.90); }
-.fab.on { border-color: var(--accent); background: rgba(212,240,80,0.14); }
+.fab:active { transform: scale(0.88); }
+.fab.on {
+  border-color: var(--accent);
+  background: rgba(200,240,0,0.14);
+  box-shadow: 0 0 12px rgba(200,240,0,0.3);
+}
 
-#btn-follow { bottom: 176px; right: 16px; }
+#btn-follow { bottom: 174px; right: 14px; }
 #btn-units  {
-  bottom: 176px; left: 16px;
+  bottom: 174px; left: 14px;
   font-family: 'Syne', sans-serif; font-weight: 700;
   font-size: 0.58rem; letter-spacing: 0.08em;
   color: var(--paper);
 }
-#btn-places { bottom: 120px; right: 16px; }
+#btn-places { bottom: 118px; right: 14px; }
 
 /* ── DWELL ── */
 #dwell-badge {
-  position: fixed; bottom: 120px; left: 16px;
-  background: var(--glass);
-  border: 1px solid var(--border);
+  position: fixed; bottom: 118px; left: 14px; z-index: 10;
+  background: rgba(11,11,16,0.80);
+  border: 1px solid rgba(200,240,0,0.2);
   backdrop-filter: blur(10px);
   border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 0.52rem; letter-spacing: 0.1em;
+  padding: 7px 12px;
+  font-size: 0.50rem; letter-spacing: 0.1em;
   color: var(--muted); display: none;
 }
 #dwell-badge.visible { display: block; }
@@ -203,43 +204,54 @@ html, body {
 
 /* ── BOTTOM CONTROLS ── */
 #controls {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  padding: 12px 16px 36px;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 10;
+  padding: 12px 14px 36px;
   display: flex; gap: 10px; align-items: stretch;
-  background: linear-gradient(to top, rgba(13,13,18,0.96) 60%, transparent 100%);
+  background: linear-gradient(to top, rgba(11,11,16,0.97) 55%, transparent 100%);
 }
 
+/* START TRACKING — the green light */
 #btn-track {
   flex: 1;
   font-family: 'Syne', sans-serif; font-weight: 800;
-  font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--ink); background: var(--accent);
+  font-size: 0.82rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: #0b0b10;
+  background: var(--accent);
   border: none; border-radius: var(--radius);
   padding: 18px 20px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.12s, background 0.2s;
-  box-shadow:
-    0 0 0 2px rgba(212,240,80,0.15),
-    0 4px 20px rgba(212,240,80,0.5),
-    0 8px 48px rgba(212,240,80,0.25);
-  animation: gbreathe 2.8s ease-in-out infinite;
+  animation: breathe 2.6s ease-in-out infinite;
 }
-@keyframes gbreathe {
-  0%,100% { box-shadow: 0 0 0 2px rgba(212,240,80,0.15), 0 4px 20px rgba(212,240,80,0.5),  0 8px 48px rgba(212,240,80,0.25); }
-  50%      { box-shadow: 0 0 0 4px rgba(212,240,80,0.08), 0 4px 28px rgba(212,240,80,0.72), 0 12px 60px rgba(212,240,80,0.38); }
+@keyframes breathe {
+  0%,100% {
+    box-shadow:
+      0 0 0 2px rgba(200,240,0,0.15),
+      0 4px 18px rgba(200,240,0,0.55),
+      0 10px 50px rgba(200,240,0,0.28);
+  }
+  50% {
+    box-shadow:
+      0 0 0 4px rgba(200,240,0,0.08),
+      0 4px 28px rgba(200,240,0,0.78),
+      0 14px 64px rgba(200,240,0,0.42);
+  }
 }
 #btn-track:active { transform: scale(0.97); }
 #btn-track.active {
   background: var(--red); color: #fff;
-  box-shadow: 0 4px 20px rgba(240,80,80,0.45);
+  box-shadow: 0 4px 22px rgba(240,80,80,0.5);
   animation: none;
 }
-#btn-track:disabled { opacity: 0.2; pointer-events: none; box-shadow: none; animation: none; }
+#btn-track:disabled {
+  opacity: 0.2; pointer-events: none;
+  box-shadow: none; animation: none;
+}
 
 #btn-clear {
-  font-family: 'DM Mono', monospace; font-size: 0.56rem;
-  letter-spacing: 0.08em; text-transform: uppercase;
+  font-family: 'DM Mono', monospace; font-size: 0.54rem;
+  letter-spacing: 0.06em; text-transform: uppercase;
   color: var(--muted);
   background: var(--surface);
   border: 1px solid var(--border);
@@ -248,72 +260,76 @@ html, body {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   white-space: nowrap;
-  transition: color 0.2s;
+  transition: color 0.2s, border-color 0.2s;
 }
-#btn-clear:hover { color: var(--paper); }
-#btn-clear:disabled { opacity: 0.15; pointer-events: none; }
+#btn-clear:hover   { color: var(--paper); border-color: rgba(255,255,255,0.2); }
+#btn-clear:disabled{ opacity: 0.15; pointer-events: none; }
 
 /* ── PULSE DOT ── */
 .pulse-dot {
   width: 16px; height: 16px; border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 0 3px rgba(13,13,18,0.7);
+  box-shadow: 0 0 0 3px rgba(11,11,16,0.7);
   animation: pdot 2s infinite;
 }
 @keyframes pdot {
-  0%   { box-shadow: 0 0 0 3px rgba(13,13,18,0.7), 0 0 0 0 rgba(212,240,80,0.6); }
-  70%  { box-shadow: 0 0 0 3px rgba(13,13,18,0.7), 0 0 0 14px rgba(212,240,80,0); }
-  100% { box-shadow: 0 0 0 3px rgba(13,13,18,0.7), 0 0 0 0 rgba(212,240,80,0); }
+  0%   { box-shadow: 0 0 0 3px rgba(11,11,16,0.7), 0 0 0 0   rgba(200,240,0,0.7); }
+  70%  { box-shadow: 0 0 0 3px rgba(11,11,16,0.7), 0 0 0 14px rgba(200,240,0,0); }
+  100% { box-shadow: 0 0 0 3px rgba(11,11,16,0.7), 0 0 0 0   rgba(200,240,0,0); }
 }
 
-/* ── WELCOME CARD — floats over map, doesn't block it ── */
+/* ── WELCOME CARD ── */
 #welcome {
   position: fixed;
-  top: 160px; left: 50%; transform: translateX(-50%);
-  background: var(--glass);
-  border: 1px solid var(--border);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 14px;
-  padding: 24px 24px;
+  top: 148px; left: 50%; transform: translateX(-50%);
+  z-index: 12;
+  background: rgba(11,11,16,0.86);
+  border: 1px solid rgba(200,240,0,0.2);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border-radius: 16px;
+  padding: 22px 22px 18px;
   text-align: center;
-  max-width: 280px; width: 84vw;
+  max-width: 272px; width: 82vw;
   display: none;
-  /* pointer-events only on the card itself */
-  pointer-events: all;
+  box-shadow: 0 0 40px rgba(200,240,0,0.08);
 }
 #welcome.visible { display: block; }
 #welcome h2 {
   font-family: 'Syne', sans-serif; font-weight: 800;
-  font-size: 0.95rem; letter-spacing: 0.14em;
+  font-size: 0.95rem; letter-spacing: 0.18em;
   color: var(--accent); margin-bottom: 10px;
+  text-shadow: 0 0 20px rgba(200,240,0,0.5);
 }
-#welcome p { font-size: 0.6rem; color: var(--muted); line-height: 1.85; }
+#welcome p { font-size: 0.59rem; color: var(--muted); line-height: 1.9; }
 #welcome-close {
+  display: inline-block;
   margin-top: 14px;
   font-family: 'Syne', sans-serif; font-weight: 700;
-  font-size: 0.55rem; letter-spacing: 0.12em;
-  color: var(--muted); cursor: pointer;
-  text-transform: uppercase;
+  font-size: 0.52rem; letter-spacing: 0.14em;
+  color: rgba(200,240,0,0.5);
+  cursor: pointer; text-transform: uppercase;
   -webkit-tap-highlight-color: transparent;
+  transition: color 0.2s;
 }
+#welcome-close:hover { color: var(--accent); }
 
-/* ── PLACE SHEET OVERLAY — tap outside to cancel ── */
+/* ── PLACE SHEET OVERLAY ── */
 #place-overlay {
-  position: fixed; inset: 0; z-index: 19;
-  background: rgba(0,0,0,0.45);
+  position: fixed; inset: 0; z-index: 18;
+  background: rgba(0,0,0,0.5);
   display: none;
+  -webkit-tap-highlight-color: transparent;
 }
 #place-overlay.show { display: block; }
 
 /* ── PLACE SHEET ── */
 #place-sheet {
-  position: fixed; bottom: -340px; left: 0; right: 0;
-  z-index: 20;
-  background: #1c1c26;
-  border: 1px solid rgba(255,255,255,0.12); border-bottom: none;
+  position: fixed; bottom: -360px; left: 0; right: 0; z-index: 19;
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.10); border-bottom: none;
   border-radius: 20px 20px 0 0;
-  padding: 10px 22px 52px;
+  padding: 8px 20px 52px;
   transition: bottom 0.32s cubic-bezier(0.4,0,0.2,1);
 }
 #place-sheet.open { bottom: 0; }
@@ -322,39 +338,46 @@ html, body {
 #place-sheet::before {
   content: '';
   display: block;
-  width: 36px; height: 4px;
-  background: rgba(255,255,255,0.15);
+  width: 38px; height: 4px;
+  background: rgba(255,255,255,0.14);
   border-radius: 2px;
-  margin: 0 auto 18px;
+  margin: 10px auto 18px;
 }
 
-#place-sheet-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 8px;
+#sheet-top {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
 }
 
-#place-sheet h3 {
+#sheet-title {
   font-family: 'Syne', sans-serif; font-weight: 700;
-  font-size: 0.75rem; letter-spacing: 0.14em;
+  font-size: 0.72rem; letter-spacing: 0.14em;
   color: var(--amber); text-transform: uppercase;
 }
 
-#place-sheet-x {
-  font-size: 1.1rem; color: var(--muted);
-  cursor: pointer; padding: 4px 8px;
+#sheet-x {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; color: var(--muted);
   -webkit-tap-highlight-color: transparent;
-  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
 }
+#sheet-x:hover { background: rgba(255,255,255,0.14); color: var(--paper); }
+#sheet-x:active { transform: scale(0.90); }
 
 #place-coords {
-  font-size: 0.46rem; color: var(--muted);
+  font-size: 0.44rem; color: var(--muted);
   letter-spacing: 0.08em; margin-bottom: 16px;
 }
 
 #place-input {
   width: 100%;
-  background: rgba(255,255,255,0.06);
-  border: 1.5px solid rgba(240,160,48,0.4);
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(240,160,48,0.35);
   border-radius: 10px;
   padding: 15px 16px;
   font-family: 'Syne', sans-serif; font-weight: 700;
@@ -363,51 +386,69 @@ html, body {
   margin-bottom: 14px;
   caret-color: var(--amber);
 }
-#place-input::placeholder { color: rgba(232,228,219,0.25); font-weight: 400; font-family: 'DM Mono', monospace; }
-#place-input:focus { border-color: var(--amber); background: rgba(240,160,48,0.06); }
+#place-input::placeholder {
+  color: rgba(237,234,224,0.22);
+  font-weight: 400; font-family: 'DM Mono', monospace;
+}
+#place-input:focus {
+  border-color: var(--amber);
+  background: rgba(240,160,48,0.07);
+  box-shadow: 0 0 0 3px rgba(240,160,48,0.12);
+}
 
 .sheet-btns { display: flex; gap: 10px; }
 .sBtn {
   flex: 1; font-family: 'Syne', sans-serif; font-weight: 700;
-  font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase;
+  font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase;
   border-radius: 10px; padding: 15px; cursor: pointer; border: none;
   -webkit-tap-highlight-color: transparent;
   transition: opacity 0.15s, transform 0.12s;
 }
-.sBtn:active { transform: scale(0.97); opacity: 0.85; }
-.sBtn.ok  { background: var(--amber); color: var(--ink); }
-.sBtn.no  { background: rgba(255,255,255,0.06); color: var(--muted); border: 1px solid var(--border); }
+.sBtn:active { transform: scale(0.96); opacity: 0.8; }
+.sBtn.ok { background: var(--amber); color: var(--ink); }
+.sBtn.no { background: rgba(255,255,255,0.06); color: var(--muted); border: 1px solid var(--border); }
 
 /* ── PLACE POPUP ── */
 #place-popup {
-  position: fixed;
-  background: var(--glass);
-  border: 1px solid rgba(240,160,48,0.3);
-  backdrop-filter: blur(14px);
-  border-radius: 8px;
-  padding: 10px 14px;
+  position: fixed; z-index: 15;
+  background: rgba(11,11,16,0.92);
+  border: 1px solid rgba(240,160,48,0.35);
+  backdrop-filter: blur(16px);
+  border-radius: 10px;
+  padding: 12px 16px;
   font-size: 0.62rem; color: var(--paper);
-  display: none; max-width: 180px;
+  display: none; max-width: 190px;
   pointer-events: all;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
-#place-popup .pname { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--amber); margin-bottom: 3px; }
-#place-popup .pdel  { font-size: 0.48rem; color: var(--muted); cursor: pointer; margin-top: 8px; display: block; }
+#place-popup .pname {
+  font-family: 'Syne', sans-serif; font-weight: 700;
+  color: var(--amber); margin-bottom: 4px; font-size: 0.78rem;
+}
+#place-popup .pcoords { font-size: 0.44rem; color: var(--muted); margin-bottom: 6px; }
+#place-popup .pdel {
+  font-size: 0.48rem; color: rgba(240,80,80,0.6);
+  cursor: pointer; display: block; margin-top: 8px;
+  transition: color 0.15s;
+}
+#place-popup .pdel:hover { color: var(--red); }
 
 /* ── PLACE MARKER ── */
 .pmarker {
-  width: 30px; height: 30px; border-radius: 50%;
-  background: var(--amber); border: 2px solid var(--ink);
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--amber);
+  border: 2px solid var(--ink);
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.75rem; cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  font-size: 0.8rem; cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5), 0 0 8px rgba(240,160,48,0.3);
+  transition: transform 0.15s;
 }
+.pmarker:active { transform: scale(0.90); }
 ```
 
   </style>
 </head>
 <body>
-
-<!-- MAP — always behind everything -->
 
 <div id="map"></div>
 
@@ -451,60 +492,61 @@ html, body {
 
 <div id="dwell-badge">Dwell: <strong id="dwell-val">—</strong></div>
 
-<!-- WELCOME — floats over map, map still visible around it -->
+<!-- WELCOME -->
 
 <div id="welcome" class="visible">
   <h2>FOOTPRINT</h2>
-  <p>Tap <strong style="color:var(--paper)">START TRACKING</strong> to record today's trail.<br><br>Each day saves separately. Swipe the chips above to revisit past days.<br><br>Tap 📌 to drop a named pin at your location.</p>
+  <p>Tap <strong style="color:var(--paper)">START TRACKING</strong> to record today's trail.<br><br>Each day saves separately. Tap chips above to revisit past days.<br><br>Tap 📌 to pin a named place at your location.</p>
   <div id="welcome-close">Got it ✕</div>
 </div>
 
-<!-- BOTTOM CONTROLS -->
+<!-- CONTROLS -->
 
 <div id="controls">
   <button id="btn-clear">Clear Day</button>
   <button id="btn-track">Start Tracking</button>
 </div>
 
-<!-- PLACE SHEET OVERLAY -->
+<!-- PLACE OVERLAY (tap to cancel) -->
 
 <div id="place-overlay"></div>
 
-<!-- PLACE SHEET (slides up) -->
+<!-- PLACE SHEET -->
 
 <div id="place-sheet">
-  <div id="place-sheet-header">
-    <h3>📌 Name this place</h3>
-    <span id="place-sheet-x">✕</span>
+  <div id="sheet-top">
+    <span id="sheet-title">📌 Name this place</span>
+    <button id="sheet-x">✕</button>
   </div>
   <div id="place-coords"></div>
   <input id="place-input" type="text" placeholder="Home, Gym, Coffee shop…" maxlength="40" autocomplete="off" />
   <div class="sheet-btns">
-    <button class="sBtn no"  id="place-cancel">Cancel</button>
-    <button class="sBtn ok"  id="place-save">Save Pin</button>
+    <button class="sBtn no" id="place-cancel">Cancel</button>
+    <button class="sBtn ok" id="place-save">Save Pin</button>
   </div>
 </div>
 
 <!-- PLACE POPUP -->
 
 <div id="place-popup">
-  <div class="pname" id="pop-name"></div>
-  <span class="pdel" id="pop-del">✕ Remove pin</span>
+  <div class="pname"   id="pop-name"></div>
+  <div class="pcoords" id="pop-coords"></div>
+  <span class="pdel"   id="pop-del">✕ Remove pin</span>
 </div>
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const TOKEN     = 'pk.eyJ1IjoidW5jb21tb25jb3dib3kiLCJhIjoiY21rNjN2c2R1MHFodjNkb2wybWxweGNvNyJ9.4j78jvsPEWDh-T19ZSeqMA';
-const TICK      = 8000;   // record GPS point every 8s
-const MAX_DAYS  = 14;
-const PL_KEY    = 'fp_places_v1';
+const TOKEN    = 'pk.eyJ1IjoidW5jb21tb25jb3dib3kiLCJhIjoiY21rNjN2c2R1MHFodjNkb2wybWxweGNvNyJ9.4j78jvsPEWDh-T19ZSeqMA';
+const TICK     = 8000;
+const MAX_DAYS = 14;
+const PL_KEY   = 'fp_places_v1';
 
 // ── UNITS ────────────────────────────────────────────────
 let metric = localStorage.getItem('fp_units') !== 'mi';
-const toDisplay = km => metric ? km : km * 0.621371;
-const unitLbl   = ()  => metric ? 'km' : 'mi';
+const toDisp = km => metric ? km : km * 0.621371;
+const uLbl   = ()  => metric ? 'km' : 'mi';
 
-// ── DATE HELPERS ─────────────────────────────────────────
+// ── DATE ─────────────────────────────────────────────────
 function pad(n) { return String(n).padStart(2,'0'); }
 
 function todayKey() {
@@ -515,20 +557,20 @@ function todayKey() {
 function keyLabel(key) {
   const [y,m,d] = key.replace('fp_','').split('-').map(Number);
   const dt = new Date(y, m-1, d);
-  const today = new Date(); today.setHours(0,0,0,0);
-  const diff = Math.round((today - dt) / 86400000);
+  const now = new Date(); now.setHours(0,0,0,0);
+  const diff = Math.round((now - dt) / 86400000);
   if (diff === 0) return 'Today';
   if (diff === 1) return 'Yesterday';
-  return dt.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+  return dt.toLocaleDateString('en-US',{ month:'short', day:'numeric' });
 }
 
-function allDayKeys() {
-  const keys = [];
+function allKeys() {
+  const out = [];
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (k && k.startsWith('fp_') && !k.includes('places') && !k.includes('units')) keys.push(k);
+    if (k && k.startsWith('fp_') && !k.includes('places') && !k.includes('units')) out.push(k);
   }
-  return keys.sort().reverse();
+  return out.sort().reverse();
 }
 
 function loadDay(key) {
@@ -537,7 +579,7 @@ function loadDay(key) {
 
 function saveDay(key, pts) {
   try { localStorage.setItem(key, JSON.stringify(pts)); } catch {}
-  const keys = allDayKeys();
+  const keys = allKeys();
   if (keys.length > MAX_DAYS) keys.slice(MAX_DAYS).forEach(k => localStorage.removeItem(k));
 }
 
@@ -547,18 +589,18 @@ try { places = JSON.parse(localStorage.getItem(PL_KEY) || '[]'); } catch {}
 function savePlaces() { try { localStorage.setItem(PL_KEY, JSON.stringify(places)); } catch {} }
 
 // ── STATE ────────────────────────────────────────────────
-let tracking    = false;
-let followMode  = true;
-let watchId     = null;
-let tickId      = null;
-let timerId     = null;
-let startTime   = null;
-let currentPos  = null;
-let dot         = null;   // pulse marker
-let pendingLL   = null;   // lngLat for next pin
-let pMarkers    = [];     // place marker objects
-let activeDay   = todayKey();
-let points      = loadDay(activeDay);
+let tracking   = false;
+let followMode = true;
+let watchId    = null;
+let tickId     = null;
+let timerId    = null;
+let startTime  = null;
+let currentPos = null;
+let dot        = null;
+let pendingLL  = null;
+let pMarkers   = [];
+let activeDay  = todayKey();
+let points     = loadDay(activeDay);
 
 // ── MAP ──────────────────────────────────────────────────
 mapboxgl.accessToken = TOKEN;
@@ -571,7 +613,7 @@ const map = new mapboxgl.Map({
   attributionControl: false
 });
 
-map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'top-right');
+map.addControl(new mapboxgl.AttributionControl({ compact:true }), 'top-right');
 
 map.on('load', () => {
   addSources();
@@ -584,39 +626,47 @@ map.on('load', () => {
 
 // ── SOURCES ──────────────────────────────────────────────
 function addSources() {
-  map.addSource('trail', { type:'geojson', data: fc([]) });
+  map.addSource('trail', { type:'geojson', data:fc([]) });
 
   map.addLayer({
     id:'trail-glow', type:'line', source:'trail',
     layout:{ 'line-cap':'round','line-join':'round' },
-    paint:{ 'line-color':'#d4f050','line-width':['*',['get','w'],4],'line-opacity':0.1,'line-blur':10 }
+    paint:{
+      'line-color':'#c8f000',
+      'line-width':['*',['get','w'],4.5],
+      'line-opacity':0.12, 'line-blur':12
+    }
   });
 
   map.addLayer({
     id:'trail-line', type:'line', source:'trail',
     layout:{ 'line-cap':'round','line-join':'round' },
-    paint:{ 'line-color':'#d4f050','line-width':['get','w'],'line-opacity':0.82 }
+    paint:{
+      'line-color':'#c8f000',
+      'line-width':['get','w'],
+      'line-opacity':0.88
+    }
   });
 
-  map.addSource('dwell', { type:'geojson', data: fc([]) });
+  map.addSource('dwell', { type:'geojson', data:fc([]) });
   map.addLayer({
     id:'dwell-rings', type:'circle', source:'dwell',
     paint:{
-      'circle-radius':['interpolate',['linear'],['get','n'],1,10,10,50],
-      'circle-color':'#d4f050',
-      'circle-opacity':['interpolate',['linear'],['get','n'],1,0.05,10,0.22],
-      'circle-blur':1.4
+      'circle-radius':['interpolate',['linear'],['get','n'],1,12,10,52],
+      'circle-color':'#c8f000',
+      'circle-opacity':['interpolate',['linear'],['get','n'],1,0.06,10,0.24],
+      'circle-blur':1.5
     }
   }, 'trail-glow');
 }
 
-function fc(features) { return { type:'FeatureCollection', features }; }
+function fc(f) { return { type:'FeatureCollection', features:f }; }
 
 // ── DAY STRIP ────────────────────────────────────────────
 function buildStrip() {
   const strip = document.getElementById('day-strip');
   strip.innerHTML = '';
-  const keys = allDayKeys();
+  const keys = allKeys();
   if (!keys.includes(todayKey())) keys.unshift(todayKey());
 
   keys.forEach(key => {
@@ -633,9 +683,7 @@ function buildStrip() {
 
 function switchDay(key) {
   if (tracking) stopTracking();
-  activeDay = key;
-  points    = loadDay(key);
-  startTime = null;
+  activeDay = key; points = loadDay(key); startTime = null;
 
   document.querySelectorAll('.day-chip').forEach(c =>
     c.classList.toggle('active', c.dataset.key === key)
@@ -657,35 +705,34 @@ function switchDay(key) {
   updateStats();
 }
 
-// ── RENDER TRAIL ─────────────────────────────────────────
+// ── RENDER ───────────────────────────────────────────────
 function renderTrail() {
   if (points.length < 2) return;
-  const lines = [], dmap = {};
+  const lines = [], dm = {};
 
   for (let i = 0; i < points.length - 1; i++) {
     const a = points[i], b = points[i+1];
     const k = dkey(a);
-    dmap[k] = (dmap[k] || 0) + 1;
+    dm[k] = (dm[k]||0) + 1;
     lines.push({
       type:'Feature',
       geometry:{ type:'LineString', coordinates:[[a.lng,a.lat],[b.lng,b.lat]] },
-      properties:{ w: Math.min(2 + (dmap[k]||1) * 0.85, 13) }
+      properties:{ w: Math.min(2 + (dm[k]||1)*0.85, 13) }
     });
   }
 
   map.getSource('trail').setData(fc(lines));
-
   map.getSource('dwell').setData(fc(
-    Object.entries(dmap).map(([k, n]) => {
+    Object.entries(dm).map(([k,n]) => {
       const [lat,lng] = k.split(',').map(Number);
       return { type:'Feature', geometry:{ type:'Point', coordinates:[lng,lat] }, properties:{ n } };
     })
   ));
 
-  const maxD = Math.max(...Object.values(dmap));
-  if (maxD > 2) {
+  const mx = Math.max(...Object.values(dm));
+  if (mx > 2) {
     document.getElementById('dwell-badge').classList.add('visible');
-    document.getElementById('dwell-val').textContent = `${maxD} passes`;
+    document.getElementById('dwell-val').textContent = `${mx} passes`;
   }
 }
 
@@ -710,18 +757,20 @@ function startTracking() {
   document.getElementById('welcome').classList.remove('visible');
   tracking  = true;
   startTime = startTime || Date.now();
-  document.getElementById('btn-track').textContent = 'Stop Tracking';
-  document.getElementById('btn-track').classList.add('active');
-  timerId = setInterval(tickTimer, 1000);
+  const btn = document.getElementById('btn-track');
+  btn.textContent = 'Stop Tracking';
+  btn.classList.add('active');
 
+  // Make stats glow green while live
+  document.querySelectorAll('.stat-val').forEach(el => el.classList.add('live'));
+
+  timerId = setInterval(tickTimer, 1000);
   watchId = navigator.geolocation.watchPosition(onPos, onGeoErr,
     { enableHighAccuracy:true, maximumAge:3000 });
-
-  tickId = setInterval(() => { if (currentPos) logPoint(currentPos); }, TICK);
+  tickId  = setInterval(() => { if (currentPos) logPoint(currentPos); }, TICK);
 
   navigator.geolocation.getCurrentPosition(pos => {
-    currentPos = pos;
-    logPoint(pos);
+    currentPos = pos; logPoint(pos);
     map.flyTo({ center:[pos.coords.longitude, pos.coords.latitude], zoom:16, duration:700 });
   }, onGeoErr, { enableHighAccuracy:true });
 }
@@ -729,10 +778,11 @@ function startTracking() {
 function stopTracking() {
   tracking = false;
   if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-  clearInterval(tickId);
-  clearInterval(timerId);
-  document.getElementById('btn-track').textContent = 'Resume Tracking';
-  document.getElementById('btn-track').classList.remove('active');
+  clearInterval(tickId); clearInterval(timerId);
+  const btn = document.getElementById('btn-track');
+  btn.textContent = 'Resume Tracking';
+  btn.classList.remove('active');
+  document.querySelectorAll('.stat-val').forEach(el => el.classList.remove('live'));
 }
 
 function onPos(pos) {
@@ -742,9 +792,7 @@ function onPos(pos) {
     const el = document.createElement('div');
     el.className = 'pulse-dot';
     dot = new mapboxgl.Marker({ element:el }).setLngLat([lng,lat]).addTo(map);
-  } else {
-    dot.setLngLat([lng,lat]);
-  }
+  } else { dot.setLngLat([lng,lat]); }
   if (followMode) map.easeTo({ center:[lng,lat], duration:700 });
 }
 
@@ -752,9 +800,7 @@ function logPoint(pos) {
   const { longitude:lng, latitude:lat } = pos.coords;
   points.push({ lng, lat, ts:Date.now() });
   saveDay(activeDay, points);
-  buildStrip();
-  renderTrail();
-  updateStats();
+  buildStrip(); renderTrail(); updateStats();
 }
 
 function onGeoErr(e) { console.warn('GPS:', e.message); }
@@ -778,44 +824,60 @@ map.on('dragstart', () => {
 });
 
 // ── UNITS ────────────────────────────────────────────────
-const btnUnits = document.getElementById('btn-units');
-btnUnits.addEventListener('click', () => {
+document.getElementById('btn-units').addEventListener('click', () => {
   metric = !metric;
   localStorage.setItem('fp_units', metric ? 'km' : 'mi');
-  updateUnits();
-  updateStats();
+  updateUnits(); updateStats();
 });
 
 function updateUnits() {
-  btnUnits.textContent = metric ? 'KM' : 'MI';
-  btnUnits.classList.toggle('on', !metric);
-  document.getElementById('stat-dist-lbl').textContent = unitLbl();
+  const btn = document.getElementById('btn-units');
+  btn.textContent = metric ? 'KM' : 'MI';
+  btn.classList.toggle('on', !metric);
+  document.getElementById('stat-dist-lbl').textContent = uLbl();
 }
 
 // ── PLACES ───────────────────────────────────────────────
 const btnPlaces  = document.getElementById('btn-places');
 const placeSheet = document.getElementById('place-sheet');
 const placeInput = document.getElementById('place-input');
+const overlay    = document.getElementById('place-overlay');
+
+function openSheet() {
+  placeInput.value = '';
+  document.getElementById('place-coords').textContent =
+    pendingLL ? `📍 ${pendingLL.lat.toFixed(5)}, ${pendingLL.lng.toFixed(5)}` : '';
+  placeSheet.classList.add('open');
+  overlay.classList.add('show');
+  setTimeout(() => placeInput.focus(), 350);
+}
+
+function closeSheet() {
+  placeSheet.classList.remove('open');
+  overlay.classList.remove('show');
+  btnPlaces.classList.remove('on');
+  btnPlaces.textContent = '📌';
+  pendingLL = null;
+}
+
+// Three ways to close: overlay, ✕ button, Cancel button
+overlay.addEventListener('click', closeSheet);
+document.getElementById('sheet-x').addEventListener('click', closeSheet);
+document.getElementById('place-cancel').addEventListener('click', closeSheet);
 
 btnPlaces.addEventListener('click', () => {
-  // Toggle sheet
-  if (placeSheet.classList.contains('open')) {
-    closePlaceSheet();
-    return;
-  }
-
+  if (placeSheet.classList.contains('open')) { closeSheet(); return; }
   btnPlaces.classList.add('on');
 
-  // Use current GPS if available
   if (currentPos) {
     pendingLL = { lng: currentPos.coords.longitude, lat: currentPos.coords.latitude };
-    openPlaceSheet();
+    openSheet();
   } else {
     btnPlaces.textContent = '⏳';
     navigator.geolocation.getCurrentPosition(pos => {
       btnPlaces.textContent = '📌';
       pendingLL = { lng: pos.coords.longitude, lat: pos.coords.latitude };
-      openPlaceSheet();
+      openSheet();
     }, () => {
       btnPlaces.textContent = '📌';
       btnPlaces.classList.remove('on');
@@ -824,38 +886,17 @@ btnPlaces.addEventListener('click', () => {
   }
 });
 
-function openPlaceSheet() {
-  placeInput.value = '';
-  document.getElementById('place-coords').textContent =
-    pendingLL ? `📍 ${pendingLL.lat.toFixed(5)}, ${pendingLL.lng.toFixed(5)}` : '';
-  placeSheet.classList.add('open');
-  document.getElementById('place-overlay').classList.add('show');
-  setTimeout(() => placeInput.focus(), 380);
-}
-
-function closePlaceSheet() {
-  placeSheet.classList.remove('open');
-  document.getElementById('place-overlay').classList.remove('show');
-  btnPlaces.classList.remove('on');
-  pendingLL = null;
-}
-
-// Close on overlay tap, X button, or cancel
-document.getElementById('place-overlay').addEventListener('click', closePlaceSheet);
-document.getElementById('place-sheet-x').addEventListener('click', closePlaceSheet);
-document.getElementById('place-cancel').addEventListener('click', closePlaceSheet);
-
 document.getElementById('place-save').addEventListener('click', () => {
   const name = placeInput.value.trim();
   if (!name) { placeInput.focus(); return; }
-  if (!pendingLL) { closePlaceSheet(); return; }
+  if (!pendingLL) { closeSheet(); return; }
 
-  const place = { id: Date.now(), name, lng: pendingLL.lng, lat: pendingLL.lat };
+  const place = { id:Date.now(), name, lng:pendingLL.lng, lat:pendingLL.lat };
   places.push(place);
   savePlaces();
   addPlaceMarker(place);
   map.flyTo({ center:[place.lng, place.lat], zoom:16, duration:700 });
-  closePlaceSheet();
+  closeSheet();
 });
 
 // ── PLACE MARKERS ────────────────────────────────────────
@@ -876,16 +917,17 @@ function addPlaceMarker(place) {
 
   el.addEventListener('click', e => {
     e.stopPropagation();
-    const popup = document.getElementById('place-popup');
-    popup.style.display = 'block';
-    popup.style.left = Math.min(e.clientX + 10, window.innerWidth - 190) + 'px';
-    popup.style.top  = Math.max(e.clientY - 70, 10) + 'px';
-    document.getElementById('pop-name').textContent = place.name;
+    const pp = document.getElementById('place-popup');
+    pp.style.display = 'block';
+    pp.style.left = Math.min(e.clientX + 12, window.innerWidth - 200) + 'px';
+    pp.style.top  = Math.max(e.clientY - 90, 10) + 'px';
+    document.getElementById('pop-name').textContent   = place.name;
+    document.getElementById('pop-coords').textContent =
+      `${place.lat.toFixed(4)}, ${place.lng.toFixed(4)}`;
     document.getElementById('pop-del').onclick = () => {
       places = places.filter(p => p.id !== place.id);
-      savePlaces();
-      drawPlaces();
-      popup.style.display = 'none';
+      savePlaces(); drawPlaces();
+      pp.style.display = 'none';
     };
   });
 
@@ -909,11 +951,10 @@ document.getElementById('btn-clear').addEventListener('click', () => {
   if (tracking) stopTracking();
   document.getElementById('btn-track').textContent = 'Start Tracking';
   document.getElementById('welcome').classList.add('visible');
-  buildStrip();
-  updateStats();
+  buildStrip(); updateStats();
 });
 
-// ── WELCOME CLOSE ─────────────────────────────────────────
+// ── WELCOME CLOSE ────────────────────────────────────────
 document.getElementById('welcome-close').addEventListener('click', () => {
   document.getElementById('welcome').classList.remove('visible');
 });
@@ -922,7 +963,8 @@ document.getElementById('welcome-close').addEventListener('click', () => {
 function updateStats() {
   const km = calcKm();
   document.getElementById('stat-pts').textContent  = points.length;
-  document.getElementById('stat-dist').textContent = points.length < 2 ? '—' : toDisplay(km).toFixed(2);
+  document.getElementById('stat-dist').textContent =
+    points.length < 2 ? '—' : toDisp(km).toFixed(2);
 }
 
 function calcKm() {
@@ -936,7 +978,7 @@ function haversine(a, b) {
   const dLat = (b.lat - a.lat) * Math.PI / 180;
   const dLng = (b.lng - a.lng) * Math.PI / 180;
   const x = Math.sin(dLat/2)**2 +
-            Math.cos(a.lat*Math.PI/180) * Math.cos(b.lat*Math.PI/180) * Math.sin(dLng/2)**2;
+            Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
   return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
 }
 
