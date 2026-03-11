@@ -400,6 +400,7 @@ html, body { height: 100%; background: var(--ink); font-family: 'DM Mono', monos
 
 <div id="place-sheet">
   <h3>📌 Name this place</h3>
+  <div id="place-coords-display" style="font-size:0.5rem;color:var(--muted);margin-bottom:10px;letter-spacing:0.1em;"></div>
   <input id="place-input" type="text" placeholder="e.g. Home, Gym, Coffee spot…" maxlength="40" />
   <div id="place-sheet-btns">
     <button class="sheet-btn cancel" id="place-cancel">Cancel</button>
@@ -469,8 +470,7 @@ html, body { height: 100%; background: var(--ink); font-family: 'DM Mono', monos
   // ── STATE ──
   let tracking    = false;
   let followMode  = true;
-  let placingMode = false;
-  let ignoreNextMapClick = false;
+  let pendingLngLat = null;
   let watchId     = null;
   let intervalId  = null;
   let timerTick   = null;
@@ -718,26 +718,58 @@ html, body { height: 100%; background: var(--ink); font-family: 'DM Mono', monos
   const placeInput = document.getElementById('place-input');
   const popup      = document.getElementById('place-popup');
 
+  // Tap 📌 → grab GPS immediately → open sheet → user names it → save
   btnPlaces.addEventListener('click', () => {
-    placingMode = !placingMode;
-    btnPlaces.classList.toggle('active-fab', placingMode);
-    map.getCanvas().style.cursor = placingMode ? 'crosshair' : '';
-    if (!placingMode) closePlaceSheet();
-    // Ignore the very next map click — it's the same tap that activated this button
-    if (placingMode) ignoreNextMapClick = true;
+    hidePopup();
+
+    // If sheet already open, close it
+    if (placeSheet.classList.contains('open')) {
+      closePlaceSheet();
+      btnPlaces.classList.remove('active-fab');
+      return;
+    }
+
+    btnPlaces.classList.add('active-fab');
+
+    // Try to use current GPS position first
+    if (currentPos) {
+      pendingLngLat = { lng: currentPos.coords.longitude, lat: currentPos.coords.latitude };
+      openPlaceSheet();
+    } else {
+      // No GPS yet — ask for it now
+      btnPlaces.textContent = '⏳';
+      navigator.geolocation.getCurrentPosition(pos => {
+        pendingLngLat = { lng: pos.coords.longitude, lat: pos.coords.latitude };
+        btnPlaces.textContent = '📌';
+        openPlaceSheet();
+      }, () => {
+        // GPS failed — let user tap map instead
+        btnPlaces.textContent = '📌';
+        alert('Could not get your location. Make sure location access is allowed.');
+        btnPlaces.classList.remove('active-fab');
+      }, { enableHighAccuracy: true, timeout: 8000 });
+    }
   });
 
-  map.on('click', e => {
-    hidePopup();
-    if (ignoreNextMapClick) { ignoreNextMapClick = false; return; }
-    if (!placingMode) return;
-    pendingLngLat = e.lngLat;
+  function openPlaceSheet() {
     placeInput.value = '';
+    if (pendingLngLat) {
+      document.getElementById('place-coords-display').textContent =
+        `📍 ${pendingLngLat.lat.toFixed(5)}, ${pendingLngLat.lng.toFixed(5)}`;
+    }
     placeSheet.classList.add('open');
     setTimeout(() => placeInput.focus(), 350);
+  }
+
+  // Map click still works as fallback on desktop
+  map.on('click', e => {
+    hidePopup();
   });
 
-  document.getElementById('place-cancel').addEventListener('click', closePlaceSheet);
+  document.getElementById('place-cancel').addEventListener('click', () => {
+    closePlaceSheet();
+    btnPlaces.classList.remove('active-fab');
+  });
 
   document.getElementById('place-confirm').addEventListener('click', () => {
     const name = placeInput.value.trim();
@@ -747,9 +779,9 @@ html, body { height: 100%; background: var(--ink); font-family: 'DM Mono', monos
     savePlaces();
     addPlaceMarker(place);
     closePlaceSheet();
-    placingMode = false;
     btnPlaces.classList.remove('active-fab');
-    map.getCanvas().style.cursor = '';
+    // Fly to the pin
+    map.flyTo({ center: [place.lng, place.lat], zoom: 16, duration: 800 });
   });
 
   function closePlaceSheet() {
