@@ -60,7 +60,7 @@ html, body {
 
 #hud-inner {
   background: rgba(8,8,14,0.82);
-  border: 1px solid rgba(184,240,0,0.22);
+  border: 1px solid rgba(184,240,0,0.40);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius);
@@ -121,7 +121,7 @@ html, body {
 .stat-label {
   font-size: 0.38rem;
   letter-spacing: 0.2em;
-  color: var(--muted);
+  color: rgba(242,239,228,0.70);
   text-transform: uppercase;
   margin-top: 3px;
 }
@@ -148,18 +148,19 @@ html, body {
   font-size: 0.54rem; letter-spacing: 0.10em; text-transform: uppercase;
   padding: 7px 14px;
   border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(8,8,14,0.82);
+  border: 1.5px solid rgba(255,255,255,0.32);
+  background: rgba(28,28,42,0.90);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  color: var(--muted);
+  color: var(--paper);
   cursor: pointer; white-space: nowrap;
   -webkit-tap-highlight-color: transparent;
   transition: all 0.15s;
 }
 .day-chip.has-data {
-  border-color: rgba(184,240,0,0.30);
-  color: var(--paper);
+  border-color: rgba(184,240,0,0.55);
+  color: var(--green);
+  text-shadow: 0 0 8px rgba(184,240,0,0.3);
 }
 .day-chip.active {
   background: var(--green);
@@ -193,9 +194,10 @@ html, body {
 ══════════════════════════════════════════ */
 .fab {
   position: fixed; z-index: 10;
-  width: 48px; height: 48px; border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.15);
-  background: rgba(8,8,14,0.85);
+  width: 52px; height: 52px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.50);
+  background: rgba(30,30,46,0.97);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.6);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   cursor: pointer;
@@ -220,7 +222,8 @@ html, body {
   bottom: 176px; left: 14px;
   font-family: 'Syne', sans-serif; font-weight: 800;
   font-size: 0.60rem; letter-spacing: 0.08em;
-  color: var(--paper);
+  color: var(--green);
+  text-shadow: 0 0 10px var(--green-glow);
 }
 #btn-units.on {
   border-color: var(--amber);
@@ -242,13 +245,13 @@ html, body {
 ══════════════════════════════════════════ */
 #dwell-badge {
   position: fixed; bottom: 118px; left: 14px; z-index: 10;
-  background: rgba(8,8,14,0.85);
+  background: rgba(28,28,40,0.96);
   border: 1px solid rgba(184,240,0,0.25);
   backdrop-filter: blur(10px);
   border-radius: 8px;
   padding: 7px 12px;
   font-size: 0.50rem; letter-spacing: 0.10em;
-  color: var(--muted); display: none;
+  color: var(--paper); display: none;
 }
 #dwell-badge.visible { display: block; }
 #dwell-badge strong {
@@ -329,7 +332,7 @@ html, body {
   font-size: 0.56rem; letter-spacing: 0.10em; text-transform: uppercase;
   color: var(--red);
   background: var(--red-dim);
-  border: 1.5px solid rgba(255,77,77,0.30);
+  border: 1.5px solid rgba(255,77,77,0.65);
   border-radius: var(--radius);
   padding: 18px 14px;
   cursor: pointer;
@@ -453,7 +456,7 @@ html, body {
 #sheet-x {
   width: 34px; height: 34px; border-radius: 50%;
   background: var(--red-dim);
-  border: 1.5px solid rgba(255,77,77,0.30);
+  border: 1.5px solid rgba(255,77,77,0.65);
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   font-family: 'Syne', sans-serif; font-weight: 700;
@@ -519,10 +522,10 @@ html, body {
 
 /* Cancel — red text (it's a back-out) */
 .sBtn.no {
-  background: var(--red-dim);
-  color: var(--red);
-  border: 1.5px solid rgba(255,77,77,0.28);
-  text-shadow: 0 0 8px var(--red-glow);
+  background: rgba(255,77,77,0.15);
+  color: #ff6b6b;
+  border: 1.5px solid rgba(255,77,77,0.55);
+  text-shadow: 0 0 10px var(--red-glow);
 }
 .sBtn.no:hover { background: rgba(255,77,77,0.26); }
 
