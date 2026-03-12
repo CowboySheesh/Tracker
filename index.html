@@ -13,642 +13,221 @@
 
 ```
 :root {
-  --ink:       #08080e;
-  --surface:   #111118;
-  --card:      #17171f;
-  --border:    rgba(255,255,255,0.10);
-
-  /* Text */
-  --paper:     #f2efe4;       /* bright warm white — very readable */
-  --muted:     rgba(242,239,228,0.52);
-
-  /* Brand colors */
-  --green:     #b8f000;       /* GO: start, save, confirm */
-  --green-dim: rgba(184,240,0,0.18);
-  --green-glow:rgba(184,240,0,0.55);
-
-  --red:       #ff4d4d;       /* STOP: delete, stop, clear */
-  --red-dim:   rgba(255,77,77,0.18);
-  --red-glow:  rgba(255,77,77,0.50);
-
-  --amber:     #f5a623;       /* Places / pins */
-  --amber-dim: rgba(245,166,35,0.18);
-  --amber-glow:rgba(245,166,35,0.45);
-
-  --glass:     rgba(8,8,14,0.75);
-  --radius:    12px;
+  --green:  #b8f000;
+  --red:    #ff4444;
+  --amber:  #f5a623;
+  --ink:    #0a0a12;
+  --panel:  #1c1c2a;
+  --border: #2e2e44;
+  --white:  #f0ede2;
+  --dim:    #888899;
 }
 
-html, body {
-  height: 100%; width: 100%;
-  background: var(--ink);
-  font-family: 'DM Mono', monospace;
-  color: var(--paper);
-  overflow: hidden;
-}
+html, body { height:100%; width:100%; background:var(--ink); font-family:'DM Mono',monospace; color:var(--white); overflow:hidden; }
+#map { position:fixed; inset:0; z-index:0; }
 
-#map { position: fixed; inset: 0; z-index: 0; }
-
-/* ══════════════════════════════════════════
-   HEADER
-══════════════════════════════════════════ */
-#hud {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 10;
-  padding: 14px 14px 0;
-  pointer-events: none;
-}
-
+/* HEADER */
+#hud { position:fixed; top:0; left:0; right:0; z-index:10; padding:12px 12px 0; }
 #hud-inner {
-  background: rgba(8,8,14,0.82);
-  border: 1px solid rgba(184,240,0,0.40);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: var(--radius);
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  pointer-events: all;
-  box-shadow:
-    0 0 0 1px rgba(184,240,0,0.06),
-    inset 0 1px 0 rgba(184,240,0,0.08);
+  background:var(--panel); border:2px solid var(--green); border-radius:12px;
+  padding:12px 16px; display:flex; align-items:center; justify-content:space-between;
+  box-shadow:0 0 20px rgba(184,240,0,0.15);
 }
+#wordmark { font-family:'Syne',sans-serif; font-weight:800; font-size:18px; letter-spacing:4px; color:var(--green); text-transform:uppercase; text-shadow:0 0 12px rgba(184,240,0,0.6); line-height:1; }
+#wordmark span { display:block; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--dim); margin-top:4px; }
+#stats-row { display:flex; gap:20px; }
+.stat { text-align:right; }
+.stat-val { font-family:'Syne',sans-serif; font-weight:700; font-size:18px; color:var(--white); line-height:1; transition:color 0.3s,text-shadow 0.3s; }
+.stat-val.live { color:var(--green); text-shadow:0 0 10px rgba(184,240,0,0.7); }
+.stat-val.dim  { color:var(--dim); }
+.stat-label { font-size:9px; letter-spacing:2px; color:var(--dim); text-transform:uppercase; margin-top:3px; }
 
-/* Wordmark glows green — same as Start Tracking */
-#wordmark {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 1.05rem;
-  letter-spacing: 0.22em;
-  color: var(--green);
-  text-transform: uppercase;
-  line-height: 1;
-  text-shadow:
-    0 0 10px var(--green-glow),
-    0 0 30px rgba(184,240,0,0.25);
-}
-
-#wordmark span {
-  display: block;
-  font-family: 'DM Mono', monospace;
-  font-size: 0.40rem;
-  letter-spacing: 0.30em;
-  color: var(--muted);
-  margin-top: 4px;
-  text-shadow: none;
-  text-transform: uppercase;
-}
-
-/* Stats — bright by default */
-#stats-row { display: flex; gap: 18px; align-items: center; }
-.stat { text-align: right; }
-
-.stat-val {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 1.05rem;
-  color: var(--paper);
-  line-height: 1;
-  transition: color 0.3s, text-shadow 0.3s;
-}
-/* When tracking: stats glow green */
-.stat-val.live {
-  color: var(--green);
-  text-shadow: 0 0 10px var(--green-glow), 0 0 24px rgba(184,240,0,0.2);
-}
-.stat-val.dim { color: var(--muted); text-shadow: none; }
-
-.stat-label {
-  font-size: 0.38rem;
-  letter-spacing: 0.2em;
-  color: rgba(242,239,228,0.70);
-  text-transform: uppercase;
-  margin-top: 3px;
-}
-
-/* ══════════════════════════════════════════
-   DAY STRIP
-══════════════════════════════════════════ */
-#day-wrap {
-  position: fixed; top: 78px; left: 0; right: 0; z-index: 10;
-  padding: 0 14px;
-}
-
-#day-strip {
-  display: flex; gap: 7px;
-  overflow-x: auto; scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 2px;
-}
-#day-strip::-webkit-scrollbar { display: none; }
-
+/* DAY CHIPS */
+#day-wrap { position:fixed; top:80px; left:0; right:0; z-index:10; padding:0 12px; }
+#day-strip { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; padding-bottom:2px; }
+#day-strip::-webkit-scrollbar { display:none; }
 .day-chip {
-  flex-shrink: 0;
-  font-family: 'Syne', sans-serif; font-weight: 700;
-  font-size: 0.54rem; letter-spacing: 0.10em; text-transform: uppercase;
-  padding: 7px 14px;
-  border-radius: 20px;
-  border: 1.5px solid rgba(255,255,255,0.32);
-  background: rgba(28,28,42,0.90);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: var(--paper);
-  cursor: pointer; white-space: nowrap;
-  -webkit-tap-highlight-color: transparent;
-  transition: all 0.15s;
+  flex-shrink:0; font-family:'Syne',sans-serif; font-weight:700; font-size:12px;
+  letter-spacing:1px; text-transform:uppercase; padding:8px 16px; border-radius:20px;
+  border:2px solid var(--border); background:var(--panel); color:var(--dim);
+  cursor:pointer; white-space:nowrap; -webkit-tap-highlight-color:transparent; transition:all 0.15s;
 }
-.day-chip.has-data {
-  border-color: rgba(184,240,0,0.55);
-  color: var(--green);
-  text-shadow: 0 0 8px rgba(184,240,0,0.3);
-}
-.day-chip.active {
-  background: var(--green);
-  color: var(--ink);
-  border-color: var(--green);
-  font-weight: 800;
-  box-shadow: 0 2px 14px var(--green-glow);
-  text-shadow: none;
-}
+.day-chip.has-data { border-color:var(--green); color:var(--white); }
+.day-chip.active   { background:var(--green); border-color:var(--green); color:#000; font-weight:800; box-shadow:0 2px 14px rgba(184,240,0,0.5); }
 
-/* ══════════════════════════════════════════
-   PAST BANNER
-══════════════════════════════════════════ */
+/* PAST BANNER */
 #past-banner {
-  position: fixed; top: 122px; left: 50%; transform: translateX(-50%); z-index: 10;
-  background: var(--red-dim);
-  border: 1px solid rgba(255,77,77,0.38);
-  backdrop-filter: blur(8px);
-  border-radius: 6px;
-  padding: 5px 16px;
-  font-family: 'Syne', sans-serif; font-weight: 700;
-  font-size: 0.48rem; letter-spacing: 0.16em;
-  color: var(--red); text-transform: uppercase;
-  text-shadow: 0 0 8px var(--red-glow);
-  display: none; white-space: nowrap;
+  position:fixed; top:126px; left:50%; transform:translateX(-50%); z-index:10;
+  background:#2a1111; border:2px solid var(--red); border-radius:8px; padding:6px 16px;
+  font-family:'Syne',sans-serif; font-weight:700; font-size:11px; letter-spacing:2px;
+  color:var(--red); text-transform:uppercase; display:none; white-space:nowrap;
 }
-#past-banner.visible { display: block; }
+#past-banner.visible { display:block; }
 
-/* ══════════════════════════════════════════
-   FABs
-══════════════════════════════════════════ */
+/* FABs */
 .fab {
-  position: fixed; z-index: 10;
-  width: 52px; height: 52px; border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.50);
-  background: rgba(30,30,46,0.97);
-  box-shadow: 0 2px 16px rgba(0,0,0,0.6);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.15rem;
-  color: var(--paper);
-  -webkit-tap-highlight-color: transparent;
-  transition: all 0.18s;
+  position:fixed; z-index:10; width:56px; height:56px; border-radius:50%;
+  border:2px solid var(--border); background:var(--panel);
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-size:22px; color:var(--white); -webkit-tap-highlight-color:transparent;
+  transition:all 0.15s; box-shadow:0 4px 16px rgba(0,0,0,0.6);
 }
-.fab:active { transform: scale(0.86); }
+.fab:active { transform:scale(0.88); }
+#btn-follow { bottom:184px; right:14px; }
+#btn-follow.on { border-color:var(--green); box-shadow:0 0 18px rgba(184,240,0,0.5); }
+#btn-units { bottom:184px; left:14px; font-family:'Syne',sans-serif; font-weight:800; font-size:14px; letter-spacing:1px; color:var(--white); }
+#btn-units.on { border-color:var(--amber); color:var(--amber); box-shadow:0 0 14px rgba(245,166,35,0.4); }
+#btn-places { bottom:120px; right:14px; }
+#btn-places.on { border-color:var(--amber); box-shadow:0 0 14px rgba(245,166,35,0.4); }
 
-/* Follow FAB — green when on */
-#btn-follow { bottom: 176px; right: 14px; }
-#btn-follow.on {
-  border-color: var(--green);
-  background: var(--green-dim);
-  box-shadow: 0 0 16px var(--green-glow), 0 0 4px var(--green-glow) inset;
-}
-
-/* Units FAB */
-#btn-units {
-  bottom: 176px; left: 14px;
-  font-family: 'Syne', sans-serif; font-weight: 800;
-  font-size: 0.60rem; letter-spacing: 0.08em;
-  color: var(--green);
-  text-shadow: 0 0 10px var(--green-glow);
-}
-#btn-units.on {
-  border-color: var(--amber);
-  background: var(--amber-dim);
-  color: var(--amber);
-  box-shadow: 0 0 14px var(--amber-glow);
-}
-
-/* Places FAB — amber accent */
-#btn-places { bottom: 118px; right: 14px; }
-#btn-places.on {
-  border-color: var(--amber);
-  background: var(--amber-dim);
-  box-shadow: 0 0 14px var(--amber-glow);
-}
-
-/* ══════════════════════════════════════════
-   DWELL BADGE
-══════════════════════════════════════════ */
+/* DWELL */
 #dwell-badge {
-  position: fixed; bottom: 118px; left: 14px; z-index: 10;
-  background: rgba(28,28,40,0.96);
-  border: 1px solid rgba(184,240,0,0.25);
-  backdrop-filter: blur(10px);
-  border-radius: 8px;
-  padding: 7px 12px;
-  font-size: 0.50rem; letter-spacing: 0.10em;
-  color: var(--paper); display: none;
+  position:fixed; bottom:120px; left:14px; z-index:10;
+  background:var(--panel); border:2px solid var(--green); border-radius:10px;
+  padding:8px 14px; font-size:12px; letter-spacing:1px; color:var(--white); display:none;
 }
-#dwell-badge.visible { display: block; }
-#dwell-badge strong {
-  font-family: 'Syne', sans-serif; font-weight: 700;
-  color: var(--green);
-  text-shadow: 0 0 8px var(--green-glow);
-}
+#dwell-badge.visible { display:block; }
+#dwell-badge strong { font-family:'Syne',sans-serif; font-weight:700; color:var(--green); }
 
-/* ══════════════════════════════════════════
-   BOTTOM CONTROLS
-══════════════════════════════════════════ */
+/* BOTTOM CONTROLS */
 #controls {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 10;
-  padding: 12px 14px 38px;
-  display: flex; gap: 10px; align-items: stretch;
-  background: linear-gradient(to top, rgba(8,8,14,0.98) 58%, transparent 100%);
+  position:fixed; bottom:0; left:0; right:0; z-index:10;
+  padding:14px 14px 40px; display:flex; gap:10px; align-items:stretch;
+  background:linear-gradient(to top,rgba(10,10,18,1) 65%,transparent);
 }
-
-/* ── START TRACKING: bright green glow ── */
 #btn-track {
-  flex: 1;
-  font-family: 'Syne', sans-serif; font-weight: 800;
-  font-size: 0.85rem; letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--ink);
-  background: var(--green);
-  border: none; border-radius: var(--radius);
-  padding: 18px 20px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s, background 0.25s, box-shadow 0.25s;
-  animation: gbreathe 2.4s ease-in-out infinite;
+  flex:1; font-family:'Syne',sans-serif; font-weight:800; font-size:15px;
+  letter-spacing:3px; text-transform:uppercase; color:#000; background:var(--green);
+  border:none; border-radius:12px; padding:20px; cursor:pointer;
+  -webkit-tap-highlight-color:transparent; transition:transform 0.12s;
+  animation:gbreathe 2.4s ease-in-out infinite;
 }
 @keyframes gbreathe {
-  0%,100% {
-    box-shadow:
-      0 0 0 2px rgba(184,240,0,0.18),
-      0 4px 18px rgba(184,240,0,0.60),
-      0 10px 50px rgba(184,240,0,0.30);
-  }
-  50% {
-    box-shadow:
-      0 0 0 4px rgba(184,240,0,0.10),
-      0 4px 28px rgba(184,240,0,0.82),
-      0 14px 64px rgba(184,240,0,0.46);
-  }
+  0%,100% { box-shadow:0 4px 20px rgba(184,240,0,0.55),0 8px 40px rgba(184,240,0,0.25); }
+  50%      { box-shadow:0 4px 30px rgba(184,240,0,0.80),0 12px 56px rgba(184,240,0,0.40); }
 }
-#btn-track:active { transform: scale(0.97); }
-
-/* ── STOP TRACKING: same breathing but red ── */
-#btn-track.active {
-  background: var(--red);
-  color: #fff;
-  animation: rbreathe 2.4s ease-in-out infinite;
-}
+#btn-track:active { transform:scale(0.97); }
+#btn-track.active { background:var(--red); color:#fff; animation:rbreathe 2.4s ease-in-out infinite; }
 @keyframes rbreathe {
-  0%,100% {
-    box-shadow:
-      0 0 0 2px rgba(255,77,77,0.18),
-      0 4px 18px rgba(255,77,77,0.60),
-      0 10px 50px rgba(255,77,77,0.28);
-  }
-  50% {
-    box-shadow:
-      0 0 0 4px rgba(255,77,77,0.10),
-      0 4px 28px rgba(255,77,77,0.82),
-      0 14px 64px rgba(255,77,77,0.44);
-  }
+  0%,100% { box-shadow:0 4px 20px rgba(255,68,68,0.55),0 8px 40px rgba(255,68,68,0.25); }
+  50%      { box-shadow:0 4px 30px rgba(255,68,68,0.80),0 12px 56px rgba(255,68,68,0.40); }
 }
-
-#btn-track:disabled {
-  opacity: 0.18; pointer-events: none;
-  box-shadow: none; animation: none;
-}
-
-/* ── CLEAR DAY: red text, dim border ── */
+#btn-track:disabled { opacity:0.25; pointer-events:none; animation:none; box-shadow:none; }
 #btn-clear {
-  font-family: 'Syne', sans-serif; font-weight: 700;
-  font-size: 0.56rem; letter-spacing: 0.10em; text-transform: uppercase;
-  color: var(--red);
-  background: var(--red-dim);
-  border: 1.5px solid rgba(255,77,77,0.65);
-  border-radius: var(--radius);
-  padding: 18px 14px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  white-space: nowrap;
-  transition: all 0.2s;
-  text-shadow: 0 0 8px var(--red-glow);
+  font-family:'Syne',sans-serif; font-weight:700; font-size:12px; letter-spacing:1px;
+  text-transform:uppercase; color:var(--red); background:#2a1111;
+  border:2px solid var(--red); border-radius:12px; padding:20px 16px;
+  cursor:pointer; -webkit-tap-highlight-color:transparent; white-space:nowrap; transition:all 0.15s;
 }
-#btn-clear:hover {
-  background: rgba(255,77,77,0.28);
-  border-color: var(--red);
-}
-#btn-clear:disabled { opacity: 0.15; pointer-events: none; }
+#btn-clear:hover { background:#3a1515; }
+#btn-clear:disabled { opacity:0.2; pointer-events:none; }
 
-/* ══════════════════════════════════════════
-   PULSE DOT
-══════════════════════════════════════════ */
-.pulse-dot {
-  width: 16px; height: 16px; border-radius: 50%;
-  background: var(--green);
-  box-shadow: 0 0 0 3px rgba(8,8,14,0.8);
-  animation: pdot 2s infinite;
-}
+/* PULSE DOT */
+.pulse-dot { width:18px; height:18px; border-radius:50%; background:var(--green); border:3px solid #0a0a12; animation:pdot 2s infinite; }
 @keyframes pdot {
-  0%   { box-shadow: 0 0 0 3px rgba(8,8,14,0.8), 0 0 0 0   rgba(184,240,0,0.7); }
-  70%  { box-shadow: 0 0 0 3px rgba(8,8,14,0.8), 0 0 0 16px rgba(184,240,0,0); }
-  100% { box-shadow: 0 0 0 3px rgba(8,8,14,0.8), 0 0 0 0   rgba(184,240,0,0); }
+  0%   { box-shadow:0 0 0 0 rgba(184,240,0,0.7); }
+  70%  { box-shadow:0 0 0 16px rgba(184,240,0,0); }
+  100% { box-shadow:0 0 0 0 rgba(184,240,0,0); }
 }
 
-/* ══════════════════════════════════════════
-   WELCOME CARD
-══════════════════════════════════════════ */
+/* WELCOME */
 #welcome {
-  position: fixed;
-  top: 148px; left: 50%; transform: translateX(-50%);
-  z-index: 12;
-  background: rgba(8,8,14,0.90);
-  border: 1px solid rgba(184,240,0,0.25);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-radius: 16px;
-  padding: 24px 22px 18px;
-  text-align: center;
-  max-width: 275px; width: 82vw;
-  display: none;
-  box-shadow: 0 0 60px rgba(184,240,0,0.08);
+  position:fixed; top:150px; left:50%; transform:translateX(-50%); z-index:12;
+  background:var(--panel); border:2px solid var(--green); border-radius:16px;
+  padding:24px 22px 20px; text-align:center; max-width:280px; width:84vw;
+  display:none; box-shadow:0 0 40px rgba(184,240,0,0.12);
 }
-#welcome.visible { display: block; }
+#welcome.visible { display:block; }
+#welcome h2 { font-family:'Syne',sans-serif; font-weight:800; font-size:20px; letter-spacing:4px; color:var(--green); margin-bottom:14px; text-shadow:0 0 16px rgba(184,240,0,0.5); }
+#welcome p { font-size:13px; color:var(--white); line-height:1.8; }
+#welcome p strong { color:var(--white); }
+#welcome-close { display:inline-block; margin-top:18px; font-family:'Syne',sans-serif; font-weight:700; font-size:12px; letter-spacing:2px; color:var(--green); cursor:pointer; text-transform:uppercase; opacity:0.7; -webkit-tap-highlight-color:transparent; }
 
-#welcome h2 {
-  font-family: 'Syne', sans-serif; font-weight: 800;
-  font-size: 1rem; letter-spacing: 0.20em;
-  color: var(--green); margin-bottom: 12px;
-  text-shadow: 0 0 16px var(--green-glow), 0 0 40px rgba(184,240,0,0.20);
-}
-#welcome p {
-  font-size: 0.60rem; color: var(--paper);
-  line-height: 1.95; opacity: 0.75;
-}
-#welcome p strong { color: var(--paper); opacity: 1; }
-
-#welcome-close {
-  display: inline-block; margin-top: 16px;
-  font-family: 'Syne', sans-serif; font-weight: 700;
-  font-size: 0.52rem; letter-spacing: 0.16em;
-  color: rgba(184,240,0,0.55);
-  cursor: pointer; text-transform: uppercase;
-  -webkit-tap-highlight-color: transparent;
-  transition: color 0.2s, text-shadow 0.2s;
-}
-#welcome-close:hover {
-  color: var(--green);
-  text-shadow: 0 0 10px var(--green-glow);
-}
-
-/* ══════════════════════════════════════════
-   PLACE SHEET
-══════════════════════════════════════════ */
-#place-overlay {
-  position: fixed; inset: 0; z-index: 18;
-  background: rgba(0,0,0,0.55);
-  display: none;
-  -webkit-tap-highlight-color: transparent;
-}
-#place-overlay.show { display: block; }
-
+/* PLACE SHEET */
+#place-overlay { position:fixed; inset:0; z-index:18; background:rgba(0,0,0,0.6); display:none; }
+#place-overlay.show { display:block; }
 #place-sheet {
-  position: fixed; bottom: -380px; left: 0; right: 0; z-index: 19;
-  background: #13131c;
-  border: 1px solid rgba(255,255,255,0.12); border-bottom: none;
-  border-radius: 22px 22px 0 0;
-  padding: 8px 20px 56px;
-  transition: bottom 0.32s cubic-bezier(0.4,0,0.2,1);
+  position:fixed; bottom:-380px; left:0; right:0; z-index:19;
+  background:#1a1a28; border-top:2px solid var(--amber);
+  border-left:2px solid var(--border); border-right:2px solid var(--border);
+  border-radius:20px 20px 0 0; padding:10px 20px 54px;
+  transition:bottom 0.32s cubic-bezier(0.4,0,0.2,1);
 }
-#place-sheet.open { bottom: 0; }
-
-#place-sheet::before {
-  content: '';
-  display: block;
-  width: 38px; height: 4px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 2px;
-  margin: 12px auto 20px;
-}
-
-#sheet-top {
-  display: flex; align-items: center;
-  justify-content: space-between;
-  margin-bottom: 6px;
-}
-
-/* Sheet title — amber (it's a pin action) */
-#sheet-title {
-  font-family: 'Syne', sans-serif; font-weight: 700;
-  font-size: 0.72rem; letter-spacing: 0.14em;
-  color: var(--amber); text-transform: uppercase;
-  text-shadow: 0 0 10px var(--amber-glow);
-}
-
-/* ✕ — red, because it's a cancel/close */
+#place-sheet.open { bottom:0; }
+#place-sheet::before { content:''; display:block; width:40px; height:4px; background:var(--border); border-radius:2px; margin:12px auto 20px; }
+#sheet-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+#sheet-title { font-family:'Syne',sans-serif; font-weight:700; font-size:15px; letter-spacing:2px; color:var(--amber); text-transform:uppercase; }
 #sheet-x {
-  width: 34px; height: 34px; border-radius: 50%;
-  background: var(--red-dim);
-  border: 1.5px solid rgba(255,77,77,0.65);
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Syne', sans-serif; font-weight: 700;
-  font-size: 0.72rem;
-  color: var(--red);
-  -webkit-tap-highlight-color: transparent;
-  text-shadow: 0 0 8px var(--red-glow);
-  transition: background 0.15s, box-shadow 0.15s;
+  width:36px; height:36px; border-radius:50%; background:#2a1111; border:2px solid var(--red);
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-family:'Syne',sans-serif; font-weight:800; font-size:14px; color:var(--red);
+  -webkit-tap-highlight-color:transparent; transition:all 0.15s;
 }
-#sheet-x:hover {
-  background: rgba(255,77,77,0.28);
-  box-shadow: 0 0 12px var(--red-glow);
-}
-#sheet-x:active { transform: scale(0.88); }
-
-#place-coords {
-  font-size: 0.44rem; color: var(--muted);
-  letter-spacing: 0.08em; margin-bottom: 16px;
-}
-
-/* Input — amber focused border */
+#sheet-x:active { transform:scale(0.88); background:#3a1515; }
+#place-coords { font-size:11px; color:var(--dim); letter-spacing:1px; margin-bottom:16px; }
 #place-input {
-  width: 100%;
-  background: rgba(255,255,255,0.05);
-  border: 1.5px solid rgba(245,166,35,0.35);
-  border-radius: 10px;
-  padding: 15px 16px;
-  font-family: 'Syne', sans-serif; font-weight: 700;
-  font-size: 1rem; letter-spacing: 0.04em;
-  color: var(--paper); outline: none;
-  margin-bottom: 14px;
-  caret-color: var(--amber);
+  width:100%; background:#0f0f1c; border:2px solid var(--amber); border-radius:10px;
+  padding:16px; font-family:'Syne',sans-serif; font-weight:700; font-size:16px;
+  color:var(--white); outline:none; margin-bottom:14px; caret-color:var(--amber);
 }
-#place-input::placeholder {
-  color: rgba(242,239,228,0.25);
-  font-weight: 400; font-family: 'DM Mono', monospace;
-}
-#place-input:focus {
-  border-color: var(--amber);
-  background: rgba(245,166,35,0.07);
-  box-shadow: 0 0 0 3px rgba(245,166,35,0.14);
-}
+#place-input::placeholder { color:var(--dim); font-weight:400; font-family:'DM Mono',monospace; font-size:14px; }
+#place-input:focus { border-color:var(--green); box-shadow:0 0 0 3px rgba(184,240,0,0.15); }
+.sheet-btns { display:flex; gap:10px; }
+.sBtn { flex:1; font-family:'Syne',sans-serif; font-weight:800; font-size:13px; letter-spacing:2px; text-transform:uppercase; border-radius:10px; padding:16px; cursor:pointer; border:none; -webkit-tap-highlight-color:transparent; transition:all 0.15s; }
+.sBtn:active { transform:scale(0.96); }
+.sBtn.ok { background:var(--green); color:#000; box-shadow:0 4px 16px rgba(184,240,0,0.4); }
+.sBtn.no { background:#2a1111; color:var(--red); border:2px solid var(--red); }
 
-.sheet-btns { display: flex; gap: 10px; }
-
-/* Save Pin — green glow (it's a save/confirm) */
-.sBtn {
-  flex: 1; font-family: 'Syne', sans-serif; font-weight: 700;
-  font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase;
-  border-radius: 10px; padding: 15px; cursor: pointer; border: none;
-  -webkit-tap-highlight-color: transparent;
-  transition: all 0.15s;
-}
-.sBtn:active { transform: scale(0.96); opacity: 0.85; }
-
-.sBtn.ok {
-  background: var(--green);
-  color: var(--ink);
-  box-shadow: 0 4px 18px var(--green-glow);
-  text-shadow: none;
-}
-.sBtn.ok:hover { box-shadow: 0 4px 28px rgba(184,240,0,0.80); }
-
-/* Cancel — red text (it's a back-out) */
-.sBtn.no {
-  background: rgba(255,77,77,0.15);
-  color: #ff6b6b;
-  border: 1.5px solid rgba(255,77,77,0.55);
-  text-shadow: 0 0 10px var(--red-glow);
-}
-.sBtn.no:hover { background: rgba(255,77,77,0.26); }
-
-/* ══════════════════════════════════════════
-   PLACE POPUP
-══════════════════════════════════════════ */
+/* PLACE POPUP */
 #place-popup {
-  position: fixed; z-index: 15;
-  background: rgba(8,8,14,0.94);
-  border: 1px solid rgba(245,166,35,0.35);
-  backdrop-filter: blur(18px);
-  border-radius: 12px;
-  padding: 14px 18px;
-  display: none; max-width: 200px;
-  pointer-events: all;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.5), 0 0 20px rgba(245,166,35,0.10);
+  position:fixed; z-index:15; background:var(--panel); border:2px solid var(--amber);
+  border-radius:12px; padding:14px 18px; display:none; max-width:200px;
+  pointer-events:all; box-shadow:0 6px 24px rgba(0,0,0,0.6);
 }
-#place-popup .pname {
-  font-family: 'Syne', sans-serif; font-weight: 800;
-  font-size: 0.82rem; letter-spacing: 0.04em;
-  color: var(--amber);
-  text-shadow: 0 0 10px var(--amber-glow);
-  margin-bottom: 4px;
-}
-#place-popup .pcoords {
-  font-size: 0.44rem; color: var(--muted); margin-bottom: 6px;
-}
-/* Remove — red because it's a delete */
-#place-popup .pdel {
-  font-family: 'Syne', sans-serif; font-weight: 700;
-  font-size: 0.50rem; letter-spacing: 0.12em;
-  color: var(--red);
-  text-shadow: 0 0 8px var(--red-glow);
-  cursor: pointer; display: block; margin-top: 10px;
-  -webkit-tap-highlight-color: transparent;
-  transition: all 0.15s;
-}
-#place-popup .pdel:hover { color: #ff6666; }
+#place-popup .pname { font-family:'Syne',sans-serif; font-weight:800; font-size:16px; color:var(--amber); margin-bottom:4px; }
+#place-popup .pcoords { font-size:11px; color:var(--dim); margin-bottom:4px; }
+#place-popup .pdel { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; letter-spacing:1px; color:var(--red); cursor:pointer; display:block; margin-top:10px; -webkit-tap-highlight-color:transparent; }
 
-/* ══════════════════════════════════════════
-   PLACE MARKER
-══════════════════════════════════════════ */
-.pmarker {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: var(--amber);
-  border: 2px solid var(--ink);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.85rem; cursor: pointer;
-  box-shadow: 0 2px 14px rgba(0,0,0,0.6), 0 0 10px var(--amber-glow);
-  transition: transform 0.15s;
-}
-.pmarker:active { transform: scale(0.88); }
+/* PLACE MARKER */
+.pmarker { width:34px; height:34px; border-radius:50%; background:var(--amber); border:2px solid #000; display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; box-shadow:0 2px 12px rgba(0,0,0,0.5); transition:transform 0.15s; }
+.pmarker:active { transform:scale(0.88); }
 ```
 
   </style>
 </head>
 <body>
-
 <div id="map"></div>
 
-<!-- HEADER -->
-
-<div id="hud">
-  <div id="hud-inner">
-    <div id="wordmark">Footprint<span>daily location trail</span></div>
-    <div id="stats-row">
-      <div class="stat">
-        <div class="stat-val" id="stat-dist">—</div>
-        <div class="stat-label" id="stat-dist-lbl">km</div>
-      </div>
-      <div class="stat">
-        <div class="stat-val" id="stat-pts">0</div>
-        <div class="stat-label">pts</div>
-      </div>
-      <div class="stat">
-        <div class="stat-val" id="stat-time">—</div>
-        <div class="stat-label">time</div>
-      </div>
-    </div>
+<div id="hud"><div id="hud-inner">
+  <div id="wordmark">Footprint<span>daily location trail</span></div>
+  <div id="stats-row">
+    <div class="stat"><div class="stat-val" id="stat-dist">—</div><div class="stat-label" id="stat-dist-lbl">km</div></div>
+    <div class="stat"><div class="stat-val" id="stat-pts">0</div><div class="stat-label">pts</div></div>
+    <div class="stat"><div class="stat-val" id="stat-time">—</div><div class="stat-label">time</div></div>
   </div>
-</div>
-
-<!-- DAY CHIPS -->
+</div></div>
 
 <div id="day-wrap"><div id="day-strip"></div></div>
-
-<!-- PAST BANNER -->
-
 <div id="past-banner">Viewing past trail · read only</div>
-
-<!-- FABs -->
 
 <button class="fab on" id="btn-follow">📍</button>
 <button class="fab"    id="btn-units">KM</button>
 <button class="fab"    id="btn-places">📌</button>
 
-<!-- DWELL -->
-
 <div id="dwell-badge">Dwell: <strong id="dwell-val">—</strong></div>
-
-<!-- WELCOME -->
 
 <div id="welcome" class="visible">
   <h2>FOOTPRINT</h2>
-  <p>Tap <strong>START TRACKING</strong> to record today's trail.<br><br>
-     Each day saves separately. Tap the chips above to revisit past days.<br><br>
-     Tap 📌 to drop a named pin at your current location.</p>
+  <p>Tap <strong>START TRACKING</strong> to record today's trail.<br><br>Swipe the chips above to revisit past days.<br><br>Tap 📌 to pin a named place at your location.</p>
   <div id="welcome-close">Got it ✕</div>
 </div>
-
-<!-- CONTROLS -->
 
 <div id="controls">
   <button id="btn-clear">Clear Day</button>
   <button id="btn-track">Start Tracking</button>
 </div>
 
-<!-- PLACE OVERLAY -->
-
 <div id="place-overlay"></div>
-
-<!-- PLACE SHEET -->
-
 <div id="place-sheet">
   <div id="sheet-top">
     <span id="sheet-title">📌 Name this place</span>
@@ -662,478 +241,72 @@ html, body {
   </div>
 </div>
 
-<!-- PLACE POPUP -->
-
 <div id="place-popup">
-  <div class="pname"   id="pop-name"></div>
+  <div class="pname" id="pop-name"></div>
   <div class="pcoords" id="pop-coords"></div>
-  <span class="pdel"   id="pop-del">✕ Remove pin</span>
+  <span class="pdel" id="pop-del">✕ Remove pin</span>
 </div>
 
 <script>
-// ── CONFIG ──────────────────────────────────────────────
-const TOKEN    = 'pk.eyJ1IjoidW5jb21tb25jb3dib3kiLCJhIjoiY21rNjN2c2R1MHFodjNkb2wybWxweGNvNyJ9.4j78jvsPEWDh-T19ZSeqMA';
-const TICK     = 8000;
-const MAX_DAYS = 14;
-const PL_KEY   = 'fp_places_v1';
-
-// ── UNITS ────────────────────────────────────────────────
-let metric = localStorage.getItem('fp_units') !== 'mi';
-const toDisp = km => metric ? km : km * 0.621371;
-const uLbl   = ()  => metric ? 'km' : 'mi';
-
-// ── DATE ─────────────────────────────────────────────────
-function pad(n) { return String(n).padStart(2,'0'); }
-
-function todayKey() {
-  const d = new Date();
-  return `fp_${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const TOKEN='pk.eyJ1IjoidW5jb21tb25jb3dib3kiLCJhIjoiY21rNjN2c2R1MHFodjNkb2wybWxweGNvNyJ9.4j78jvsPEWDh-T19ZSeqMA';
+const TICK=8000,MAX_DAYS=14,PL_KEY='fp_places_v1';
+let metric=localStorage.getItem('fp_units')!=='mi';
+const toDisp=km=>metric?km:km*0.621371;
+const uLbl=()=>metric?'km':'mi';
+function pad(n){return String(n).padStart(2,'0');}
+function todayKey(){const d=new Date();return `fp_${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;}
+function keyLabel(key){const[y,m,d]=key.replace('fp_','').split('-').map(Number);const dt=new Date(y,m-1,d);const now=new Date();now.setHours(0,0,0,0);const diff=Math.round((now-dt)/86400000);if(diff===0)return'Today';if(diff===1)return'Yesterday';return dt.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+function allKeys(){const out=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('fp_')&&!k.includes('places')&&!k.includes('units'))out.push(k);}return out.sort().reverse();}
+function loadDay(key){try{const r=localStorage.getItem(key);return r?JSON.parse(r):[]}catch{return[];}}
+function saveDay(key,pts){try{localStorage.setItem(key,JSON.stringify(pts));}catch{}const keys=allKeys();if(keys.length>MAX_DAYS)keys.slice(MAX_DAYS).forEach(k=>localStorage.removeItem(k));}
+let places=[];try{places=JSON.parse(localStorage.getItem(PL_KEY)||'[]');}catch{}
+function savePlaces(){try{localStorage.setItem(PL_KEY,JSON.stringify(places));}catch{}}
+let tracking=false,followMode=true,watchId=null,tickId=null,timerId=null,startTime=null,currentPos=null,dot=null,pendingLL=null,pMarkers=[],activeDay=todayKey(),points=loadDay(todayKey());
+mapboxgl.accessToken=TOKEN;
+const map=new mapboxgl.Map({container:'map',style:'mapbox://styles/mapbox/dark-v11',center:[-80.19,25.77],zoom:14,attributionControl:false});
+map.addControl(new mapboxgl.AttributionControl({compact:true}),'top-right');
+map.on('load',()=>{initSources();buildStrip();drawPlaces();if(points.length>1){renderTrail();flyLast();}updateStats();updateUnits();});
+function initSources(){
+  map.addSource('trail',{type:'geojson',data:fc([])});
+  map.addLayer({id:'trail-glow',type:'line',source:'trail',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#b8f000','line-width':['*',['get','w'],5],'line-opacity':0.14,'line-blur':14}});
+  map.addLayer({id:'trail-line',type:'line',source:'trail',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#b8f000','line-width':['get','w'],'line-opacity':0.90}});
+  map.addSource('dwell',{type:'geojson',data:fc([])});
+  map.addLayer({id:'dwell-rings',type:'circle',source:'dwell',paint:{'circle-radius':['interpolate',['linear'],['get','n'],1,14,10,56],'circle-color':'#b8f000','circle-opacity':['interpolate',['linear'],['get','n'],1,0.07,10,0.26],'circle-blur':1.6}},'trail-glow');
 }
-
-function keyLabel(key) {
-  const [y,m,d] = key.replace('fp_','').split('-').map(Number);
-  const dt  = new Date(y, m-1, d);
-  const now = new Date(); now.setHours(0,0,0,0);
-  const diff = Math.round((now - dt) / 86400000);
-  if (diff === 0) return 'Today';
-  if (diff === 1) return 'Yesterday';
-  return dt.toLocaleDateString('en-US',{ month:'short', day:'numeric' });
-}
-
-function allKeys() {
-  const out = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (k && k.startsWith('fp_') && !k.includes('places') && !k.includes('units')) out.push(k);
-  }
-  return out.sort().reverse();
-}
-
-function loadDay(key) {
-  try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : []; } catch { return []; }
-}
-
-function saveDay(key, pts) {
-  try { localStorage.setItem(key, JSON.stringify(pts)); } catch {}
-  const keys = allKeys();
-  if (keys.length > MAX_DAYS) keys.slice(MAX_DAYS).forEach(k => localStorage.removeItem(k));
-}
-
-// ── PLACES ───────────────────────────────────────────────
-let places = [];
-try { places = JSON.parse(localStorage.getItem(PL_KEY) || '[]'); } catch {}
-function savePlaces() { try { localStorage.setItem(PL_KEY, JSON.stringify(places)); } catch {} }
-
-// ── STATE ────────────────────────────────────────────────
-let tracking   = false;
-let followMode = true;
-let watchId    = null;
-let tickId     = null;
-let timerId    = null;
-let startTime  = null;
-let currentPos = null;
-let dot        = null;
-let pendingLL  = null;
-let pMarkers   = [];
-let activeDay  = todayKey();
-let points     = loadDay(activeDay);
-
-// ── MAP ──────────────────────────────────────────────────
-mapboxgl.accessToken = TOKEN;
-
-const map = new mapboxgl.Map({
-  container: 'map',
-  style: 'mapbox://styles/mapbox/dark-v11',
-  center: [-80.19, 25.77],
-  zoom: 14,
-  attributionControl: false
-});
-
-map.addControl(new mapboxgl.AttributionControl({ compact:true }), 'top-right');
-
-map.on('load', () => {
-  initSources();
-  buildStrip();
-  drawPlaces();
-  if (points.length > 1) { renderTrail(); flyLast(); }
-  updateStats();
-  updateUnits();
-});
-
-// ── SOURCES ──────────────────────────────────────────────
-function initSources() {
-  map.addSource('trail', { type:'geojson', data:fc([]) });
-
-  map.addLayer({
-    id:'trail-glow', type:'line', source:'trail',
-    layout:{ 'line-cap':'round','line-join':'round' },
-    paint:{
-      'line-color':'#b8f000',
-      'line-width':['*',['get','w'],5],
-      'line-opacity':0.14, 'line-blur':14
-    }
-  });
-
-  map.addLayer({
-    id:'trail-line', type:'line', source:'trail',
-    layout:{ 'line-cap':'round','line-join':'round' },
-    paint:{
-      'line-color':'#b8f000',
-      'line-width':['get','w'],
-      'line-opacity':0.90
-    }
-  });
-
-  map.addSource('dwell', { type:'geojson', data:fc([]) });
-  map.addLayer({
-    id:'dwell-rings', type:'circle', source:'dwell',
-    paint:{
-      'circle-radius':['interpolate',['linear'],['get','n'],1,14,10,56],
-      'circle-color':'#b8f000',
-      'circle-opacity':['interpolate',['linear'],['get','n'],1,0.07,10,0.26],
-      'circle-blur':1.6
-    }
-  }, 'trail-glow');
-}
-
-function fc(f) { return { type:'FeatureCollection', features:f }; }
-
-// ── DAY STRIP ────────────────────────────────────────────
-function buildStrip() {
-  const strip = document.getElementById('day-strip');
-  strip.innerHTML = '';
-  const keys = allKeys();
-  if (!keys.includes(todayKey())) keys.unshift(todayKey());
-
-  keys.forEach(key => {
-    const chip = document.createElement('button');
-    chip.className = 'day-chip';
-    chip.textContent = keyLabel(key);
-    chip.dataset.key = key;
-    if (loadDay(key).length > 0) chip.classList.add('has-data');
-    if (key === activeDay) chip.classList.add('active');
-    chip.addEventListener('click', () => switchDay(key));
-    strip.appendChild(chip);
-  });
-}
-
-function switchDay(key) {
-  if (tracking) stopTracking();
-  activeDay = key; points = loadDay(key); startTime = null;
-
-  document.querySelectorAll('.day-chip').forEach(c =>
-    c.classList.toggle('active', c.dataset.key === key)
-  );
-
-  const isToday = key === todayKey();
-  document.getElementById('past-banner').classList.toggle('visible', !isToday);
-  document.getElementById('btn-track').disabled = !isToday;
-  document.getElementById('btn-clear').disabled = !isToday;
-  document.querySelectorAll('.stat-val').forEach(el => {
-    el.classList.toggle('dim', !isToday);
-    el.classList.remove('live');
-  });
-
-  map.getSource('trail').setData(fc([]));
-  map.getSource('dwell').setData(fc([]));
-  document.getElementById('dwell-badge').classList.remove('visible');
-  document.getElementById('stat-time').textContent = '—';
-
-  if (points.length > 1) { renderTrail(); flyLast(); }
-  else if (isToday) document.getElementById('welcome').classList.add('visible');
-  updateStats();
-}
-
-// ── RENDER ───────────────────────────────────────────────
-function renderTrail() {
-  if (points.length < 2) return;
-  const lines = [], dm = {};
-
-  for (let i = 0; i < points.length - 1; i++) {
-    const a = points[i], b = points[i+1];
-    const k = dkey(a);
-    dm[k] = (dm[k]||0) + 1;
-    lines.push({
-      type:'Feature',
-      geometry:{ type:'LineString', coordinates:[[a.lng,a.lat],[b.lng,b.lat]] },
-      properties:{ w: Math.min(2.5 + (dm[k]||1)*0.9, 14) }
-    });
-  }
-
-  map.getSource('trail').setData(fc(lines));
-  map.getSource('dwell').setData(fc(
-    Object.entries(dm).map(([k,n]) => {
-      const [lat,lng] = k.split(',').map(Number);
-      return { type:'Feature', geometry:{ type:'Point', coordinates:[lng,lat] }, properties:{ n } };
-    })
-  ));
-
-  const mx = Math.max(...Object.values(dm));
-  if (mx > 2) {
-    document.getElementById('dwell-badge').classList.add('visible');
-    document.getElementById('dwell-val').textContent = `${mx} passes`;
-  }
-}
-
-function dkey(pt) {
-  const r = 0.00015;
-  return `${(Math.round(pt.lat/r)*r).toFixed(5)},${(Math.round(pt.lng/r)*r).toFixed(5)}`;
-}
-
-function flyLast() {
-  if (!points.length) return;
-  const p = points[points.length-1];
-  map.flyTo({ center:[p.lng,p.lat], zoom:15, duration:900 });
-}
-
-// ── TRACKING ─────────────────────────────────────────────
-document.getElementById('btn-track').addEventListener('click', () => {
-  tracking ? stopTracking() : startTracking();
-});
-
-function startTracking() {
-  if (!navigator.geolocation) { alert('Geolocation not available.'); return; }
-  document.getElementById('welcome').classList.remove('visible');
-  tracking  = true;
-  startTime = startTime || Date.now();
-
-  const btn = document.getElementById('btn-track');
-  btn.textContent = 'Stop Tracking';
-  btn.classList.add('active');
-
-  document.querySelectorAll('.stat-val').forEach(el => {
-    el.classList.add('live');
-    el.classList.remove('dim');
-  });
-
-  timerId = setInterval(tickTimer, 1000);
-  watchId = navigator.geolocation.watchPosition(onPos, onGeoErr,
-    { enableHighAccuracy:true, maximumAge:3000 });
-  tickId  = setInterval(() => { if (currentPos) logPoint(currentPos); }, TICK);
-
-  navigator.geolocation.getCurrentPosition(pos => {
-    currentPos = pos; logPoint(pos);
-    map.flyTo({ center:[pos.coords.longitude, pos.coords.latitude], zoom:16, duration:700 });
-  }, onGeoErr, { enableHighAccuracy:true });
-}
-
-function stopTracking() {
-  tracking = false;
-  if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-  clearInterval(tickId); clearInterval(timerId);
-
-  const btn = document.getElementById('btn-track');
-  btn.textContent = 'Resume Tracking';
-  btn.classList.remove('active');
-
-  document.querySelectorAll('.stat-val').forEach(el => el.classList.remove('live'));
-}
-
-function onPos(pos) {
-  currentPos = pos;
-  const { longitude:lng, latitude:lat } = pos.coords;
-  if (!dot) {
-    const el = document.createElement('div');
-    el.className = 'pulse-dot';
-    dot = new mapboxgl.Marker({ element:el }).setLngLat([lng,lat]).addTo(map);
-  } else { dot.setLngLat([lng,lat]); }
-  if (followMode) map.easeTo({ center:[lng,lat], duration:700 });
-}
-
-function logPoint(pos) {
-  const { longitude:lng, latitude:lat } = pos.coords;
-  points.push({ lng, lat, ts:Date.now() });
-  saveDay(activeDay, points);
-  buildStrip(); renderTrail(); updateStats();
-}
-
-function onGeoErr(e) { console.warn('GPS:', e.message); }
-
-// ── FOLLOW ───────────────────────────────────────────────
-const btnFollow = document.getElementById('btn-follow');
-btnFollow.addEventListener('click', () => {
-  followMode = !followMode;
-  btnFollow.classList.toggle('on', followMode);
-  btnFollow.textContent = followMode ? '📍' : '🗺️';
-  if (followMode && currentPos)
-    map.easeTo({ center:[currentPos.coords.longitude, currentPos.coords.latitude], duration:600 });
-});
-
-map.on('dragstart', () => {
-  if (followMode) {
-    followMode = false;
-    btnFollow.classList.remove('on');
-    btnFollow.textContent = '🗺️';
-  }
-});
-
-// ── UNITS ────────────────────────────────────────────────
-document.getElementById('btn-units').addEventListener('click', () => {
-  metric = !metric;
-  localStorage.setItem('fp_units', metric ? 'km' : 'mi');
-  updateUnits(); updateStats();
-});
-
-function updateUnits() {
-  const btn = document.getElementById('btn-units');
-  btn.textContent = metric ? 'KM' : 'MI';
-  btn.classList.toggle('on', !metric);
-  document.getElementById('stat-dist-lbl').textContent = uLbl();
-}
-
-// ── PLACES ───────────────────────────────────────────────
-const btnPlaces  = document.getElementById('btn-places');
-const placeSheet = document.getElementById('place-sheet');
-const placeInput = document.getElementById('place-input');
-const overlay    = document.getElementById('place-overlay');
-
-function openSheet() {
-  placeInput.value = '';
-  document.getElementById('place-coords').textContent =
-    pendingLL ? `📍 ${pendingLL.lat.toFixed(5)}, ${pendingLL.lng.toFixed(5)}` : '';
-  placeSheet.classList.add('open');
-  overlay.classList.add('show');
-  setTimeout(() => placeInput.focus(), 350);
-}
-
-function closeSheet() {
-  placeSheet.classList.remove('open');
-  overlay.classList.remove('show');
-  btnPlaces.classList.remove('on');
-  btnPlaces.textContent = '📌';
-  pendingLL = null;
-}
-
-overlay.addEventListener('click', closeSheet);
-document.getElementById('sheet-x').addEventListener('click', closeSheet);
-document.getElementById('place-cancel').addEventListener('click', closeSheet);
-
-btnPlaces.addEventListener('click', () => {
-  if (placeSheet.classList.contains('open')) { closeSheet(); return; }
-  btnPlaces.classList.add('on');
-
-  if (currentPos) {
-    pendingLL = { lng: currentPos.coords.longitude, lat: currentPos.coords.latitude };
-    openSheet();
-  } else {
-    btnPlaces.textContent = '⏳';
-    navigator.geolocation.getCurrentPosition(pos => {
-      btnPlaces.textContent = '📌';
-      pendingLL = { lng: pos.coords.longitude, lat: pos.coords.latitude };
-      openSheet();
-    }, () => {
-      btnPlaces.textContent = '📌';
-      btnPlaces.classList.remove('on');
-      alert('Location not available. Start tracking first so the app knows where you are.');
-    }, { enableHighAccuracy:true, timeout:8000 });
-  }
-});
-
-document.getElementById('place-save').addEventListener('click', () => {
-  const name = placeInput.value.trim();
-  if (!name) { placeInput.focus(); return; }
-  if (!pendingLL) { closeSheet(); return; }
-
-  const place = { id:Date.now(), name, lng:pendingLL.lng, lat:pendingLL.lat };
-  places.push(place);
-  savePlaces();
-  addPlaceMarker(place);
-  map.flyTo({ center:[place.lng, place.lat], zoom:16, duration:700 });
-  closeSheet();
-});
-
-// ── PLACE MARKERS ────────────────────────────────────────
-function drawPlaces() {
-  pMarkers.forEach(m => m.remove());
-  pMarkers = [];
-  places.forEach(addPlaceMarker);
-}
-
-function addPlaceMarker(place) {
-  const el = document.createElement('div');
-  el.className = 'pmarker';
-  el.textContent = '📌';
-
-  const m = new mapboxgl.Marker({ element:el, anchor:'bottom' })
-    .setLngLat([place.lng, place.lat])
-    .addTo(map);
-
-  el.addEventListener('click', e => {
-    e.stopPropagation();
-    const pp = document.getElementById('place-popup');
-    pp.style.display = 'block';
-    pp.style.left = Math.min(e.clientX + 12, window.innerWidth - 210) + 'px';
-    pp.style.top  = Math.max(e.clientY - 100, 10) + 'px';
-    document.getElementById('pop-name').textContent   = place.name;
-    document.getElementById('pop-coords').textContent =
-      `${place.lat.toFixed(4)}, ${place.lng.toFixed(4)}`;
-    document.getElementById('pop-del').onclick = () => {
-      places = places.filter(p => p.id !== place.id);
-      savePlaces(); drawPlaces();
-      pp.style.display = 'none';
-    };
-  });
-
-  pMarkers.push(m);
-}
-
-map.on('click', () => {
-  document.getElementById('place-popup').style.display = 'none';
-});
-
-// ── CLEAR ────────────────────────────────────────────────
-document.getElementById('btn-clear').addEventListener('click', () => {
-  if (!confirm("Clear today's trail?")) return;
-  points = [];
-  saveDay(activeDay, points);
-  map.getSource('trail').setData(fc([]));
-  map.getSource('dwell').setData(fc([]));
-  document.getElementById('dwell-badge').classList.remove('visible');
-  startTime = null;
-  document.getElementById('stat-time').textContent = '—';
-  if (tracking) stopTracking();
-  document.getElementById('btn-track').textContent = 'Start Tracking';
-  document.getElementById('welcome').classList.add('visible');
-  buildStrip(); updateStats();
-});
-
-// ── WELCOME CLOSE ────────────────────────────────────────
-document.getElementById('welcome-close').addEventListener('click', () => {
-  document.getElementById('welcome').classList.remove('visible');
-});
-
-// ── STATS ────────────────────────────────────────────────
-function updateStats() {
-  const km = calcKm();
-  document.getElementById('stat-pts').textContent  = points.length;
-  document.getElementById('stat-dist').textContent =
-    points.length < 2 ? '—' : toDisp(km).toFixed(2);
-}
-
-function calcKm() {
-  let d = 0;
-  for (let i = 1; i < points.length; i++) d += haversine(points[i-1], points[i]);
-  return d;
-}
-
-function haversine(a, b) {
-  const R = 6371;
-  const dLat = (b.lat - a.lat) * Math.PI / 180;
-  const dLng = (b.lng - a.lng) * Math.PI / 180;
-  const x = Math.sin(dLat/2)**2 +
-            Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
-}
-
-function tickTimer() {
-  if (!startTime) return;
-  const s = Math.floor((Date.now() - startTime) / 1000);
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sec = s % 60;
-  document.getElementById('stat-time').textContent =
-    h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`;
-}
+function fc(f){return{type:'FeatureCollection',features:f};}
+function buildStrip(){const strip=document.getElementById('day-strip');strip.innerHTML='';const keys=allKeys();if(!keys.includes(todayKey()))keys.unshift(todayKey());keys.forEach(key=>{const chip=document.createElement('button');chip.className='day-chip';chip.textContent=keyLabel(key);chip.dataset.key=key;if(loadDay(key).length>0)chip.classList.add('has-data');if(key===activeDay)chip.classList.add('active');chip.addEventListener('click',()=>switchDay(key));strip.appendChild(chip);});}
+function switchDay(key){if(tracking)stopTracking();activeDay=key;points=loadDay(key);startTime=null;document.querySelectorAll('.day-chip').forEach(c=>c.classList.toggle('active',c.dataset.key===key));const isToday=key===todayKey();document.getElementById('past-banner').classList.toggle('visible',!isToday);document.getElementById('btn-track').disabled=!isToday;document.getElementById('btn-clear').disabled=!isToday;document.querySelectorAll('.stat-val').forEach(el=>{el.classList.toggle('dim',!isToday);el.classList.remove('live');});map.getSource('trail').setData(fc([]));map.getSource('dwell').setData(fc([]));document.getElementById('dwell-badge').classList.remove('visible');document.getElementById('stat-time').textContent='—';if(points.length>1){renderTrail();flyLast();}else if(isToday)document.getElementById('welcome').classList.add('visible');updateStats();}
+function renderTrail(){if(points.length<2)return;const lines=[],dm={};for(let i=0;i<points.length-1;i++){const a=points[i],b=points[i+1];const k=dkey(a);dm[k]=(dm[k]||0)+1;lines.push({type:'Feature',geometry:{type:'LineString',coordinates:[[a.lng,a.lat],[b.lng,b.lat]]},properties:{w:Math.min(2.5+(dm[k]||1)*0.9,14)}});}map.getSource('trail').setData(fc(lines));map.getSource('dwell').setData(fc(Object.entries(dm).map(([k,n])=>{const[lat,lng]=k.split(',').map(Number);return{type:'Feature',geometry:{type:'Point',coordinates:[lng,lat]},properties:{n}};})));const mx=Math.max(...Object.values(dm));if(mx>2){document.getElementById('dwell-badge').classList.add('visible');document.getElementById('dwell-val').textContent=`${mx} passes`;}}
+function dkey(pt){const r=0.00015;return`${(Math.round(pt.lat/r)*r).toFixed(5)},${(Math.round(pt.lng/r)*r).toFixed(5)}`;}
+function flyLast(){if(!points.length)return;const p=points[points.length-1];map.flyTo({center:[p.lng,p.lat],zoom:15,duration:900});}
+document.getElementById('btn-track').addEventListener('click',()=>{tracking?stopTracking():startTracking();});
+function startTracking(){if(!navigator.geolocation){alert('Geolocation not available.');return;}document.getElementById('welcome').classList.remove('visible');tracking=true;startTime=startTime||Date.now();const btn=document.getElementById('btn-track');btn.textContent='Stop Tracking';btn.classList.add('active');document.querySelectorAll('.stat-val').forEach(el=>{el.classList.add('live');el.classList.remove('dim');});timerId=setInterval(tickTimer,1000);watchId=navigator.geolocation.watchPosition(onPos,onGeoErr,{enableHighAccuracy:true,maximumAge:3000});tickId=setInterval(()=>{if(currentPos)logPoint(currentPos);},TICK);navigator.geolocation.getCurrentPosition(pos=>{currentPos=pos;logPoint(pos);map.flyTo({center:[pos.coords.longitude,pos.coords.latitude],zoom:16,duration:700});},onGeoErr,{enableHighAccuracy:true});}
+function stopTracking(){tracking=false;if(watchId!==null)navigator.geolocation.clearWatch(watchId);clearInterval(tickId);clearInterval(timerId);const btn=document.getElementById('btn-track');btn.textContent='Resume Tracking';btn.classList.remove('active');document.querySelectorAll('.stat-val').forEach(el=>el.classList.remove('live'));}
+function onPos(pos){currentPos=pos;const{longitude:lng,latitude:lat}=pos.coords;if(!dot){const el=document.createElement('div');el.className='pulse-dot';dot=new mapboxgl.Marker({element:el}).setLngLat([lng,lat]).addTo(map);}else{dot.setLngLat([lng,lat]);}if(followMode)map.easeTo({center:[lng,lat],duration:700});}
+function logPoint(pos){const{longitude:lng,latitude:lat}=pos.coords;points.push({lng,lat,ts:Date.now()});saveDay(activeDay,points);buildStrip();renderTrail();updateStats();}
+function onGeoErr(e){console.warn('GPS:',e.message);}
+const btnFollow=document.getElementById('btn-follow');
+btnFollow.addEventListener('click',()=>{followMode=!followMode;btnFollow.classList.toggle('on',followMode);btnFollow.textContent=followMode?'📍':'🗺️';if(followMode&&currentPos)map.easeTo({center:[currentPos.coords.longitude,currentPos.coords.latitude],duration:600});});
+map.on('dragstart',()=>{if(followMode){followMode=false;btnFollow.classList.remove('on');btnFollow.textContent='🗺️';}});
+document.getElementById('btn-units').addEventListener('click',()=>{metric=!metric;localStorage.setItem('fp_units',metric?'km':'mi');updateUnits();updateStats();});
+function updateUnits(){const btn=document.getElementById('btn-units');btn.textContent=metric?'KM':'MI';btn.classList.toggle('on',!metric);document.getElementById('stat-dist-lbl').textContent=uLbl();}
+const btnPlaces=document.getElementById('btn-places'),placeSheet=document.getElementById('place-sheet'),placeInput=document.getElementById('place-input'),overlay=document.getElementById('place-overlay');
+function openSheet(){placeInput.value='';document.getElementById('place-coords').textContent=pendingLL?`📍 ${pendingLL.lat.toFixed(5)}, ${pendingLL.lng.toFixed(5)}`:'';placeSheet.classList.add('open');overlay.classList.add('show');setTimeout(()=>placeInput.focus(),350);}
+function closeSheet(){placeSheet.classList.remove('open');overlay.classList.remove('show');btnPlaces.classList.remove('on');btnPlaces.textContent='📌';pendingLL=null;}
+overlay.addEventListener('click',closeSheet);
+document.getElementById('sheet-x').addEventListener('click',closeSheet);
+document.getElementById('place-cancel').addEventListener('click',closeSheet);
+btnPlaces.addEventListener('click',()=>{if(placeSheet.classList.contains('open')){closeSheet();return;}btnPlaces.classList.add('on');if(currentPos){pendingLL={lng:currentPos.coords.longitude,lat:currentPos.coords.latitude};openSheet();}else{btnPlaces.textContent='⏳';navigator.geolocation.getCurrentPosition(pos=>{btnPlaces.textContent='📌';pendingLL={lng:pos.coords.longitude,lat:pos.coords.latitude};openSheet();},()=>{btnPlaces.textContent='📌';btnPlaces.classList.remove('on');alert('Location not available. Start tracking first.');},{enableHighAccuracy:true,timeout:8000});}});
+document.getElementById('place-save').addEventListener('click',()=>{const name=placeInput.value.trim();if(!name){placeInput.focus();return;}if(!pendingLL){closeSheet();return;}const place={id:Date.now(),name,lng:pendingLL.lng,lat:pendingLL.lat};places.push(place);savePlaces();addPlaceMarker(place);map.flyTo({center:[place.lng,place.lat],zoom:16,duration:700});closeSheet();});
+function drawPlaces(){pMarkers.forEach(m=>m.remove());pMarkers=[];places.forEach(addPlaceMarker);}
+function addPlaceMarker(place){const el=document.createElement('div');el.className='pmarker';el.textContent='📌';const m=new mapboxgl.Marker({element:el,anchor:'bottom'}).setLngLat([place.lng,place.lat]).addTo(map);el.addEventListener('click',e=>{e.stopPropagation();const pp=document.getElementById('place-popup');pp.style.display='block';pp.style.left=Math.min(e.clientX+12,window.innerWidth-210)+'px';pp.style.top=Math.max(e.clientY-100,10)+'px';document.getElementById('pop-name').textContent=place.name;document.getElementById('pop-coords').textContent=`${place.lat.toFixed(4)}, ${place.lng.toFixed(4)}`;document.getElementById('pop-del').onclick=()=>{places=places.filter(p=>p.id!==place.id);savePlaces();drawPlaces();pp.style.display='none';};});pMarkers.push(m);}
+map.on('click',()=>{document.getElementById('place-popup').style.display='none';});
+document.getElementById('btn-clear').addEventListener('click',()=>{if(!confirm("Clear today's trail?"))return;points=[];saveDay(activeDay,points);map.getSource('trail').setData(fc([]));map.getSource('dwell').setData(fc([]));document.getElementById('dwell-badge').classList.remove('visible');startTime=null;document.getElementById('stat-time').textContent='—';if(tracking)stopTracking();document.getElementById('btn-track').textContent='Start Tracking';document.getElementById('welcome').classList.add('visible');buildStrip();updateStats();});
+document.getElementById('welcome-close').addEventListener('click',()=>{document.getElementById('welcome').classList.remove('visible');});
+function updateStats(){const km=calcKm();document.getElementById('stat-pts').textContent=points.length;document.getElementById('stat-dist').textContent=points.length<2?'—':toDisp(km).toFixed(2);}
+function calcKm(){let d=0;for(let i=1;i<points.length;i++)d+=haversine(points[i-1],points[i]);return d;}
+function haversine(a,b){const R=6371,dLat=(b.lat-a.lat)*Math.PI/180,dLng=(b.lng-a.lng)*Math.PI/180;const x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+function tickTimer(){if(!startTime)return;const s=Math.floor((Date.now()-startTime)/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;document.getElementById('stat-time').textContent=h>0?`${h}:${pad(m)}:${pad(sec)}`:`${pad(m)}:${pad(sec)}`;}
 </script>
 
 </body>
